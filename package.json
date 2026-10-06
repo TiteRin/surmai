@@ -20,6 +20,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "sync-translations": "i18next-scanner --config i18next-scanner.config.json",
+    "preview:pull": "./scripts/preview-data.sh pull",
+    "preview:serve": "./scripts/preview-data.sh serve",
     "release": "release-it"
   },
   "dependencies": {
