@@ -14,8 +14,9 @@ import { AttachmentsUploadField } from '../attachments/AttachmentsUploadField.ts
 import { TravellerMultiSelect } from '../TravellerMultiSelect.tsx';
 
 import type { SaveEntityPayload } from '../../../lib/api';
-import type { Activity, ActivityFormSchema, Attachment, Expense, TravellerProfile, Trip } from '../../../types/trips.ts';
+import type { ActivityCategory, Activity, ActivityFormSchema, Attachment, Expense, TravellerProfile, Trip } from '../../../types/trips.ts';
 import type { UseFormReturnType } from '@mantine/form';
+import { CategorySelect } from './CategorySelect.tsx';
 
 export const GenericActivityForm = ({
   trip,
@@ -55,6 +56,7 @@ export const GenericActivityForm = ({
       link: activity?.link,
       place: activity?.metadata?.place,
       travellers: activity?.travellers || [],
+      category: activity?.category,
     },
   });
 
@@ -89,6 +91,7 @@ export const GenericActivityForm = ({
           endDate: fakeAsUtcString(values.endDate),
           link: values.link,
           travellers: values.travellers || [],
+          category: values.category || null,
           cost: { value: values.cost, currency: values.currencyCode },
           metadata: { place: values.place },
         },
@@ -192,12 +195,9 @@ export const GenericActivityForm = ({
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <TextInput
-            name={'link'}
-            label={t('link', 'Link')}
-            key={form.key('link')}
-            description={t('link_desc', 'Related link')}
-            {...form.getInputProps('link')}
+          <CategorySelect
+            propName={'category'}
+            form={form}
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>
@@ -210,7 +210,15 @@ export const GenericActivityForm = ({
             description={t('activity_cost_desc', 'Charges for this activity')}
           />
         </Grid.Col>
-
+        <Grid.Col span={{ base: 12, md: 12 }}>
+          <TextInput
+            name={'link'}
+            label={t('link', 'Link')}
+            key={form.key('link')}
+            description={t('link_desc', 'Related link')}
+            {...form.getInputProps('link')}
+          />
+        </Grid.Col>
         <Grid.Col span={12}>
           <TravellerMultiSelect
             tripTravellers={tripTravellers}

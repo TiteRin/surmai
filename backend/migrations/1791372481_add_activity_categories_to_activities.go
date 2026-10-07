@@ -16,7 +16,7 @@ func init() {
 
 		activities.Fields.Add(
 			&core.RelationField{
-				Name:          "categories",
+				Name:          "category",
 				CollectionId:  activityCategoriesCollection.Id,
 				MaxSelect:     1,
 				Required:      false,

@@ -239,6 +239,15 @@ export const enum LodgingType {
   CAMP_SITE = 'camp_site',
 }
 
+export interface ActivityCategory extends RecordModel {
+  id: string;
+  key: string;
+  name: string;
+  emoji: string;
+  color: string;
+  order: number;
+}
+
 export interface Activity extends RecordModel {
   id: string;
   name: string;
@@ -252,6 +261,7 @@ export interface Activity extends RecordModel {
   attachmentReferences?: string[];
   expenseId?: string;
   travellers?: string[];
+  category?: string;
 }
 
 export type CreateActivity = Omit<Activity, 'id'>;
@@ -267,6 +277,7 @@ export type ActivityFormSchema = {
   place?: Place;
   link?: string;
   travellers?: string[];
+  category?: string;
 };
 
 export interface Airport extends Omit<RecordModel, 'collectionName,collectionId'> {
