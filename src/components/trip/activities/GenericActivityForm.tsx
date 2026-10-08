@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCurrentUser } from '../../../auth/useCurrentUser.ts';
-import { saveActivity } from '../../../lib/api';
+import { saveActivity } from '@/src/lib/api';
 import i18n from '../../../lib/i18n.ts';
 import { fakeAsUtcString, getFormatDateTimeString, getTimePickerFormat } from '../../../lib/time.ts';
 import { PlaceSelect } from '../../places/PlaceSelect.tsx';
@@ -13,10 +13,11 @@ import { CurrencyInput } from '../../util/CurrencyInput.tsx';
 import { AttachmentsUploadField } from '../attachments/AttachmentsUploadField.tsx';
 import { TravellerMultiSelect } from '../TravellerMultiSelect.tsx';
 
-import type { SaveEntityPayload } from '../../../lib/api';
-import type { ActivityCategory, Activity, ActivityFormSchema, Attachment, Expense, TravellerProfile, Trip } from '../../../types/trips.ts';
+import type { SaveEntityPayload } from '@/src/lib/api';
+import type { Activity, ActivityFormSchema, Attachment, Expense, TravellerProfile, Trip } from '../../../types/trips.ts';
 import type { UseFormReturnType } from '@mantine/form';
 import { CategorySelect } from './CategorySelect.tsx';
+import { useActivityCategories } from '@/src/lib/hooks/useActivityCategories.ts';
 
 export const GenericActivityForm = ({
   trip,
@@ -42,6 +43,8 @@ export const GenericActivityForm = ({
 
   // Get expense from map if activity has an expenseId
   const expense = activity?.expenseId && expenseMap ? expenseMap.get(activity.expenseId) : undefined;
+
+  const { categories } = useActivityCategories();
 
   const form = useForm<ActivityFormSchema>({
     mode: 'uncontrolled',
@@ -198,6 +201,7 @@ export const GenericActivityForm = ({
           <CategorySelect
             propName={'category'}
             form={form}
+            categories={categories}
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>
