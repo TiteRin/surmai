@@ -1,6 +1,7 @@
 import type { User } from './auth.ts';
 import type { Dayjs } from 'dayjs';
 import type { RecordModel } from 'pocketbase';
+import { CategoryColorName } from '@/src/app/theme.ts';
 
 export type Entity = Omit<RecordModel, 'collectionId' | 'collectionName'>;
 
@@ -244,7 +245,7 @@ export interface ActivityCategory extends RecordModel {
   key: string;
   name: string;
   emoji: string;
-  color: string;
+  color: CategoryColorName;
   order: number;
 }
 
@@ -262,6 +263,9 @@ export interface Activity extends RecordModel {
   expenseId?: string;
   travellers?: string[];
   category?: string;
+  expand: {
+    category: ActivityCategory;
+  }
 }
 
 export type CreateActivity = Omit<Activity, 'id'>;

@@ -63,6 +63,23 @@ const availableColors: { [key: string]: string[] } = {
     '#6d4b40',
   ],
 };
+
+export const categoryColors: Record<string, string> = {
+  red: '#b5706b',
+  pink: '#b9808f',
+  grape: '#9a7aa0',
+  violet: '#8479a8',
+  indigo: '#6f7fa8',
+  blue: '#6b8fae',
+  cyan: '#6aa0a8',
+  teal: '#6a9e92',
+  green: '#7b9a78',
+  lime: '#9aa56c',
+  yellow: '#c2a45c',
+  orange: '#c88a5a',
+};
+
+
 export const buildTheme = (primaryColor: string = 'blueGray') => {
   return createTheme({
     fontFamily: 'Verdana, sans-serif',
@@ -71,3 +88,6 @@ export const buildTheme = (primaryColor: string = 'blueGray') => {
     primaryColor: availableColors[primaryColor] ? primaryColor : 'blueGray',
   });
 };
+
+export type CategoryColorName = keyof typeof categoryColors;
+export const getCategoryColor = (category: CategoryColorName) => categoryColors[category];
