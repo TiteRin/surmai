@@ -47,6 +47,10 @@ export {
 } from './pocketbase/activities.ts';
 
 export {
+  listActivityCategories
+} from './pocketbase/activity_categories.ts';
+
+export {
   loadCities,
   loadAirports,
   loadAirlines,
