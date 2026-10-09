@@ -1,4 +1,4 @@
-import { Box, Grid, Modal, rem, Text, Anchor, Stack } from '@mantine/core';
+import { Box, Grid, Modal, rem, Text, Anchor, Flex } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
 import { IconActivity } from '@tabler/icons-react';
@@ -105,8 +105,8 @@ export const GenericActivityData = ({
         />
       </Modal>
       <Grid align={'top'} p={'xs'} grow={false}>
-        <Grid.Col span={{ base: 12, sm: 12, md: 1, lg: 1 }} p={'md'} visibleFrom={'md'}>
-          <Box component="div">
+        <Grid.Col span={{ base: 12, sm: 12, md: 1, lg: 1 }} visibleFrom={'md'} align={'center'}>
+          <Box component="div" align={'center'}>
             <IconActivity
               size={'var(--mantine-font-size-xs)'}
               stroke={0.5}
@@ -157,21 +157,21 @@ export const GenericActivityData = ({
             </Anchor>
           )}
         </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 2 }}>
-          <Stack gap="xs">
-            <Box component="div">
+        <Grid.Col span={{ base: 12, sm: 12, md: 2, lg: 2 }}>
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 6, md: 12 }}>
               <Text size="xs" c={'dimmed'}>
                 {t('category', 'Category')}
               </Text>
               <CategoryBadge category={category} />
-            </Box>
-            <Box component="div">
+            </Grid.Col>
+            <Grid.Col span={{base: 12, sm: 6, md: 12}}>
               <Text size="xs" c={'dimmed'}>
                 {t('cost', 'Cost')}
               </Text>
               <Text size="md">{formatCost(expense?.cost)}</Text>
-            </Box>
-          </Stack>
+            </Grid.Col>
+          </Grid>
         </Grid.Col>
       </Grid>
       <TravellerBadges travellerIds={activity.travellers} tripTravellers={tripTravellers} />

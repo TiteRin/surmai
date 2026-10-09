@@ -29,12 +29,13 @@ export const DataLine = ({
     const width = "var(--mantine-spacing-xs)"
 
     if (!status) {
-      return {};
+      return {
+        paddingLeft: width,
+      };
     }
 
     return {
       borderLeft: `${width} solid ${status}`,
-      paddingLeft: 0,
     };
   };
 
