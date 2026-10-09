@@ -27,5 +27,6 @@ tests/playwright/.auth
 test-results
 backend/pb_data
 backend/pb_test_data
+backend/pb_preview_data
 backend/.env
 .env.local
