@@ -1,8 +1,13 @@
 import type { User } from './auth.ts';
 import type { Dayjs } from 'dayjs';
 import type { RecordModel } from 'pocketbase';
+import { CategoryColorName } from '@/src/app/theme.ts';
 
-export type Entity = Omit<RecordModel, 'collectionId' | 'collectionName'>;
+type StrictOmit<T, K extends PropertyKey> = {
+  [P in keyof T as P extends K ? never : P]: T[P];
+};
+
+export type Entity = StrictOmit<RecordModel, 'collectionId' | 'collectionName'>;
 
 export type Participant = {
   name: string;
@@ -239,6 +244,15 @@ export const enum LodgingType {
   CAMP_SITE = 'camp_site',
 }
 
+export interface ActivityCategory extends RecordModel {
+  id: string;
+  key: string;
+  name: string;
+  emoji: string;
+  color: CategoryColorName;
+  order: number;
+}
+
 export interface Activity extends RecordModel {
   id: string;
   name: string;
@@ -252,6 +266,10 @@ export interface Activity extends RecordModel {
   attachmentReferences?: string[];
   expenseId?: string;
   travellers?: string[];
+  category?: string;
+  expand: {
+    category: ActivityCategory;
+  }
 }
 
 export type CreateActivity = Omit<Activity, 'id'>;
@@ -267,6 +285,7 @@ export type ActivityFormSchema = {
   place?: Place;
   link?: string;
   travellers?: string[];
+  category?: string;
 };
 
 export interface Airport extends Omit<RecordModel, 'collectionName,collectionId'> {

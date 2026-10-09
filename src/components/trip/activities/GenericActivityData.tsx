@@ -1,22 +1,24 @@
-import { Box, Grid, Modal, rem, Text, Anchor } from '@mantine/core';
+import { Box, Grid, Modal, rem, Text, Anchor, Flex } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
 import { IconActivity } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
-import { deleteActivity, deleteActivityAttachments } from '../../../lib/api';
-import { showDeleteNotification } from '../../../lib/notifications.tsx';
-import { formatDate, formatTime } from '../../../lib/time.ts';
+import { deleteActivity, deleteActivityAttachments } from '@/src/lib/api';
+import { showDeleteNotification } from '@/src/lib/notifications.tsx';
+import { formatDate, formatTime } from '@/src/lib/time.ts';
 import { Attachments } from '../attachments/Attachments.tsx';
 import { DataLine } from '../DataLine.tsx';
 import { TravellerBadges } from '../TravellerBadges.tsx';
 import { GenericActivityForm } from './GenericActivityForm.tsx';
-import { useSurmaiContext } from '../../../app/useSurmaiContext.ts';
-import { useCurrentUser } from '../../../auth/useCurrentUser.ts';
-import { getMapsLink } from '../../../lib/places.ts';
+import { useSurmaiContext } from '@/src/app/useSurmaiContext.ts';
+import { useCurrentUser } from '@/src/auth/useCurrentUser.ts';
+import { getMapsLink } from '@/src/lib/places.ts';
 
-import type { Activity, Attachment, Expense, TravellerProfile, Trip } from '../../../types/trips.ts';
+import type { Activity, Attachment, Expense, TravellerProfile, Trip } from '@/src/types/trips.ts';
 import { formatCost } from '../expenses/helper.ts';
+import { getCategoryColor } from '@/src/app/theme.ts';
+import CategoryBadge from '@/src/components/trip/activities/CategoryBadge.tsx';
 
 export const GenericActivityData = ({
   trip,
@@ -42,6 +44,9 @@ export const GenericActivityData = ({
     return activity.attachmentReferences?.includes(attachment.id);
   });
 
+  const { category } = activity.expand;
+  const status = category ? getCategoryColor(category.color) : undefined;
+
   // Get expense from map, handle null/undefined cases
   const expense = activity.expenseId ? expenseMap.get(activity.expenseId) : undefined;
 
@@ -49,6 +54,7 @@ export const GenericActivityData = ({
     <DataLine
       trip={trip}
       link={activity.link}
+      status={status}
       onEdit={() => {
         openForm();
       }}
@@ -99,8 +105,8 @@ export const GenericActivityData = ({
         />
       </Modal>
       <Grid align={'top'} p={'xs'} grow={false}>
-        <Grid.Col span={{ base: 12, sm: 12, md: 1, lg: 1 }} p={'md'}>
-          <Box component="div" visibleFrom={'md'}>
+        <Grid.Col span={{ base: 12, sm: 12, md: 1, lg: 1 }} visibleFrom={'md'} align={'center'}>
+          <Box component="div" align={'center'}>
             <IconActivity
               size={'var(--mantine-font-size-xs)'}
               stroke={0.5}
@@ -151,11 +157,21 @@ export const GenericActivityData = ({
             </Anchor>
           )}
         </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 2 }}>
-          <Text size="xs" c={'dimmed'}>
-            {t('cost', 'Cost')}
-          </Text>
-          <Text size="md">{formatCost(expense?.cost)}</Text>
+        <Grid.Col span={{ base: 12, sm: 12, md: 2, lg: 2 }}>
+          <Grid>
+            <Grid.Col span={{ base: 12, sm: 6, md: 12 }}>
+              <Text size="xs" c={'dimmed'}>
+                {t('category', 'Category')}
+              </Text>
+              <CategoryBadge category={category} />
+            </Grid.Col>
+            <Grid.Col span={{base: 12, sm: 6, md: 12}}>
+              <Text size="xs" c={'dimmed'}>
+                {t('cost', 'Cost')}
+              </Text>
+              <Text size="md">{formatCost(expense?.cost)}</Text>
+            </Grid.Col>
+          </Grid>
         </Grid.Col>
       </Grid>
       <TravellerBadges travellerIds={activity.travellers} tripTravellers={tripTravellers} />

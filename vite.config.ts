@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { configDefaults } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -93,6 +94,7 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       alias: {
+        '@': fileURLToPath(new URL('./', import.meta.url)),
         ...(mode === 'development' && {
           // See https://github.com/mantinedev/ui.mantine.dev/issues/113
           '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',

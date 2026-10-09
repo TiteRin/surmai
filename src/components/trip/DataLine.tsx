@@ -12,18 +12,35 @@ export const DataLine = ({
   onDelete,
   trip,
   link = undefined,
+  status = undefined,
 }: {
   trip: Trip;
   link: string | undefined;
   children: React.ReactNode;
   onEdit?: () => void;
   onDelete?: () => void;
+  status?: string;
 }) => {
   const [, setMenuOpened] = useState(false);
   const { t } = useTranslation();
 
+  const getPaperStyle = (status?: string) => {
+
+    const width = "var(--mantine-spacing-xs)"
+
+    if (!status) {
+      return {
+        paddingLeft: width,
+      };
+    }
+
+    return {
+      borderLeft: `${width} solid ${status}`,
+    };
+  };
+
   return (
-    <Paper withBorder pos={'relative'}>
+    <Paper withBorder pos={'relative'} style={getPaperStyle(status)}>
       <Group pos={'absolute'} right={'5px'} top={'2px'}>
         <Menu position="bottom-start" onClose={() => setMenuOpened(false)} onOpen={() => setMenuOpened(true)}>
           <Menu.Target>
