@@ -10,6 +10,7 @@ require (
 	github.com/openai/openai-go/v3 v3.50.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pocketbase/dbx v1.12.0
+	github.com/pocketbase/ozzo-validation/v4 v4.3.0
 	github.com/pocketbase/pocketbase v0.39.10
 	github.com/ringsaturn/tzf v1.2.5
 	github.com/samber/lo v1.53.0
@@ -20,7 +21,6 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/goccy/go-json v0.10.6 // indirect
 	github.com/pb33f/ordered-map/v2 v2.3.1 // indirect
-	github.com/pocketbase/ozzo-validation/v4 v4.3.0 // indirect
 	github.com/ringsaturn/orb v0.15.0 // indirect
 	github.com/ringsaturn/tzf-dist v0.0.2026-c-fix1 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.6 // indirect

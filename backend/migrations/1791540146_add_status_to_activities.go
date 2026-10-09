@@ -8,45 +8,45 @@ import (
 func init() {
 	m.Register(func(app core.App) error {
 
-        activities, err := app.FindCollectionByNameOrId("activities")
-        if err != nil {
-            return err
-        }
+		activities, err := app.FindCollectionByNameOrId("activities")
+		if err != nil {
+			return err
+		}
 
-        pos := len(activities.Fields)
-        for i, f := range activities.Fields {
-            if f.GetName() == "trip" {
-                pos = i
-                break
-            }
-        }
+		pos := len(activities.Fields)
+		for i, f := range activities.Fields {
+			if f.GetName() == "trip" {
+				pos = i
+				break
+			}
+		}
 
-        activities.Fields.AddAt(
-            pos,
-            &core.SelectField{
-                Name:       "status",
-                Values:     []string{"draft", "planned"},
-                MaxSelect:  1,
-                Required:   true,
-            })
+		activities.Fields.AddAt(
+			pos,
+			&core.SelectField{
+				Name:      "status",
+				Values:    []string{"draft", "planned"},
+				MaxSelect: 1,
+				Required:  true,
+			})
 
-        if err := app.Save(activities); err != nil {
-            return err
-        }
+		if err := app.Save(activities); err != nil {
+			return err
+		}
 
-        _, err = app.DB().
-            NewQuery("UPDATE activities SET status = 'planned' WHERE status = '' OR status IS NULL").
-            Execute()
+		_, err = app.DB().
+			NewQuery("UPDATE activities SET status = 'planned' WHERE status = '' OR status IS NULL").
+			Execute()
 
-        return err
+		return err
 	}, func(app core.App) error {
 		// add down queries...
 		activities, err := app.FindCollectionByNameOrId("activities")
 		if err != nil {
-		    return err
-        }
+			return err
+		}
 
-        activities.Fields.RemoveByName("status")
-        return app.Save(activities)
+		activities.Fields.RemoveByName("status")
+		return app.Save(activities)
 	})
 }

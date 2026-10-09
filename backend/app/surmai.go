@@ -127,6 +127,8 @@ func (surmai *SurmaiApp) BindEventHooks() {
 
 	surmai.Pb.OnRecordUpdateRequest("traveller_profiles").BindFunc(hooks.RestrictManagersUpdate)
 	surmai.Pb.OnRecordEnrich("traveller_profiles").BindFunc(hooks.EnrichTravellerProfileManagers)
+
+	surmai.Pb.OnRecordValidate("activities").BindFunc(hooks.ValidateActivityDates)
 }
 
 func (surmai *SurmaiApp) StartJobs() {
