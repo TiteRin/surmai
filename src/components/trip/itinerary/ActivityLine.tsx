@@ -9,6 +9,7 @@ import { TravellerBadges } from '../TravellerBadges.tsx';
 
 import type { Activity, TravellerProfile } from '../../../types/trips.ts';
 import type { Dayjs } from 'dayjs';
+import CategoryBadge from '@/src/components/trip/activities/CategoryBadge.tsx';
 
 export const ActivityLine = ({
   activity,
@@ -38,6 +39,7 @@ export const ActivityLine = ({
         </Box>
         {showStartTime && <Badge radius={'xs'}>{formatTime(activity.startDate, user)}</Badge>}
         {<Text>{`${activity.name}`}</Text>}
+        {activity.expand.category && <CategoryBadge category={activity.expand.category} />}
         {showEndTime && activity.endDate && <Badge radius={'xs'}>{formatTime(activity.endDate, user)}</Badge>}
       </Group>
 
