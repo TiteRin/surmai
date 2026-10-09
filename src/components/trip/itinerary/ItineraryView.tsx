@@ -9,9 +9,9 @@ import { ActivityLine } from './ActivityLine.tsx';
 import { buildActivitiesIndex, buildLodgingIndex, buildTransportationIndex, compareItineraryLine } from './helper.ts';
 import { LodgingLine } from './LodgingLine.tsx';
 import { TransportationLine } from './TransportationLine.tsx';
-import { listActivities, listLodgings, listTransportations } from '../../../lib/api';
+import { listActivities, listLodgings, listTransportations } from '@/src/lib/api';
 
-import type { Activity, ItineraryLine, Lodging, Transportation, TravellerProfile, Trip } from '../../../types/trips.ts';
+import type { Activity, ItineraryLine, Lodging, Transportation, TravellerProfile, Trip } from '@/src/types/trips.ts';
 
 const getDailyItinerary = (
   day: string,
@@ -54,7 +54,7 @@ export const ItineraryView = ({ trip, tripTravellers = [] }: { trip: Trip; tripT
   const { data: activities } = useQuery<{ [key: string]: Activity[] }>({
     queryKey: ['buildActivitiesIndex', tripId],
     queryFn: async () => {
-      const activitiesResult = await listActivities(tripId || '');
+      const activitiesResult = await listActivities(tripId);
       return buildActivitiesIndex(activitiesResult);
     },
   });
@@ -62,7 +62,7 @@ export const ItineraryView = ({ trip, tripTravellers = [] }: { trip: Trip; tripT
   const { data: transportations } = useQuery<{ [key: string]: Transportation[] }>({
     queryKey: ['buildTransportationIndex', tripId],
     queryFn: async () => {
-      const transportationsResult = await listTransportations(tripId || '');
+      const transportationsResult = await listTransportations(tripId);
       return buildTransportationIndex(transportationsResult);
     },
   });
@@ -70,7 +70,7 @@ export const ItineraryView = ({ trip, tripTravellers = [] }: { trip: Trip; tripT
   const { data: lodgings } = useQuery<{ [key: string]: Lodging[] }>({
     queryKey: ['buildLodgingIndex', tripId],
     queryFn: async () => {
-      const lodgingsResult = await listLodgings(tripId || '');
+      const lodgingsResult = await listLodgings(tripId);
       return buildLodgingIndex(lodgingsResult);
     },
   });

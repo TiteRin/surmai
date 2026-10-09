@@ -3,7 +3,11 @@ import type { Dayjs } from 'dayjs';
 import type { RecordModel } from 'pocketbase';
 import { CategoryColorName } from '@/src/app/theme.ts';
 
-export type Entity = Omit<RecordModel, 'collectionId' | 'collectionName'>;
+type StrictOmit<T, K extends PropertyKey> = {
+  [P in keyof T as P extends K ? never : P]: T[P];
+};
+
+export type Entity = StrictOmit<RecordModel, 'collectionId' | 'collectionName'>;
 
 export type Participant = {
   name: string;
