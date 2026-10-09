@@ -125,8 +125,13 @@ export const GenericActivityData = ({
           <Text size="xs" c={'dimmed'}>
             {t('activity_start_date', 'Start Date')}
           </Text>
-          <Text size="md">{formatDate('', activity.startDate)}</Text>
-          <Text size="md">{formatTime(activity.startDate, user)}</Text>
+          {activity.startDate && (
+            <>
+              <Text size="md">{formatDate('', activity.startDate)}</Text>
+              <Text size="md">{formatTime(activity.startDate, user)}</Text>
+            </>
+          )}
+          {!activity.startDate && <Text size="md">{t('start_date_not_set', 'Not Set')}</Text>}
         </Grid.Col>
         <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 2 }}>
           <Text size="xs" c={'dimmed'}>

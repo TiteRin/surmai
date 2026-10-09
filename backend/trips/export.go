@@ -128,6 +128,7 @@ func exportActivities(e core.App, trip *core.Record) []*bt.Activity {
 			Address:              l.GetString("address"),
 			StartDate:            l.GetDateTime("startDate"),
 			EndDate:              l.GetDateTime("endDate"),
+			Status:               l.GetString("status"),
 			AttachmentReferences: l.GetStringSlice("attachmentReferences"),
 			Link:                 l.GetString("link"),
 			ExpenseId:            l.GetString("expenseId"),

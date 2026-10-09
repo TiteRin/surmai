@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import type { Activity, ItineraryLine, Lodging, Transportation } from '../../../types/trips.ts';
+import type { ItineraryLine, Lodging, PlannedActivity, Transportation } from '../../../types/trips.ts';
 
 export const buildTransportationIndex = (transportations: Transportation[]) => {
   const transportationIndex: { [key: string]: Array<Transportation> } = {};
@@ -44,8 +44,8 @@ export const buildLodgingIndex = (lodgings: Lodging[]) => {
   return lodgingIndex;
 };
 
-export const buildActivitiesIndex = (activities: Activity[]) => {
-  const lodgingIndex: { [key: string]: Array<Activity> } = {};
+export const buildActivitiesIndex = (activities: PlannedActivity[]) => {
+  const lodgingIndex: { [key: string]: Array<PlannedActivity> } = {};
   activities?.forEach((activity) => {
     const start = dayjs(activity.startDate).startOf('day');
 

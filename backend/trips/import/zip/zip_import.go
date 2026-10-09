@@ -82,6 +82,16 @@ func importActivities(app core.App, mapping map[string]string, expenseMapping ma
 				record.Set("travellers", updatedTravellers)
 			}
 
+			status := a.Status
+			if status == "" {
+				if a.StartDate.IsZero() {
+					status = "draft"
+				} else {
+					status = "planned"
+				}
+			}
+			record.Set("status", status)
+
 			_ = app.Save(record)
 		}
 	}

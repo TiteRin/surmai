@@ -7,7 +7,7 @@ import { getMapsLink } from '../../../lib/places.ts';
 import { formatTime } from '../../../lib/time.ts';
 import { TravellerBadges } from '../TravellerBadges.tsx';
 
-import type { Activity, TravellerProfile } from '../../../types/trips.ts';
+import type { PlannedActivity, TravellerProfile } from '../../../types/trips.ts';
 import type { Dayjs } from 'dayjs';
 
 export const ActivityLine = ({
@@ -15,7 +15,7 @@ export const ActivityLine = ({
   day,
   tripTravellers = [],
 }: {
-  activity: Activity;
+  activity: PlannedActivity;
   day: Dayjs;
   tripTravellers?: TravellerProfile[];
 }) => {

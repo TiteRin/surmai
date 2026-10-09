@@ -244,14 +244,24 @@ export interface Activity extends RecordModel {
   name: string;
   description: string;
   address?: string;
-  startDate: string;
+  startDate?: string;
   endDate?: string;
   cost?: Cost;
+  status: 'draft' | 'planned';
   trip: string;
   attachments?: string[];
   attachmentReferences?: string[];
   expenseId?: string;
   travellers?: string[];
+}
+
+export interface DraftActivity extends Activity {
+  status: 'draft';
+}
+
+export interface PlannedActivity extends Activity {
+  status: 'planned';
+  startDate: string;
 }
 
 export type CreateActivity = Omit<Activity, 'id'>;
@@ -264,6 +274,7 @@ export type ActivityFormSchema = {
   currencyCode?: string;
   startDate?: string;
   endDate?: string;
+  status: 'draft' | 'planned';
   place?: Place;
   link?: string;
   travellers?: string[];

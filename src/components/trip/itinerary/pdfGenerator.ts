@@ -5,7 +5,14 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { compareItineraryLine } from './helper.ts';
 
-import type { Activity, Lodging, Transportation, Trip, ItineraryLine, TravellerProfile } from '../../../types/trips.ts';
+import type {
+  Lodging,
+  Transportation,
+  Trip,
+  ItineraryLine,
+  TravellerProfile,
+  PlannedActivity,
+} from '../../../types/trips.ts';
 import { formatDateTime } from '../../../lib/time.ts';
 import type { TDocumentDefinitions, Content } from 'pdfmake/interfaces';
 import { User } from '../../../types/auth.ts';
@@ -318,7 +325,7 @@ const formatLodging = (l: Lodging, tripTravellers: TravellerProfile[], user: Use
   };
 };
 
-const formatActivity = (a: Activity, tripTravellers: TravellerProfile[], user: User | undefined): Content => {
+const formatActivity = (a: PlannedActivity, tripTravellers: TravellerProfile[], user: User | undefined): Content => {
   return {
     table: {
       widths: ['*'],
@@ -388,7 +395,7 @@ const formatItineraryLine = (line: ItineraryLine, tripTravellers: TravellerProfi
     case 'lodging':
       return formatLodging(line as Lodging, tripTravellers, user);
     case 'activity':
-      return formatActivity(line as Activity, tripTravellers, user);
+      return formatActivity(line as PlannedActivity, tripTravellers, user);
     default:
       return '';
   }
@@ -508,7 +515,7 @@ export const downloadFullItinerary = (
   trip: Trip,
   transportations: Transportation[],
   lodgings: Lodging[],
-  activities: Activity[],
+  activities: PlannedActivity[],
   user: User | undefined,
   tripTravellers: TravellerProfile[] = [],
 ) => {
@@ -575,7 +582,7 @@ export const downloadDailyItinerary = (
   trip: Trip,
   transportations: Transportation[],
   lodgings: Lodging[],
-  activities: Activity[],
+  activities: PlannedActivity[],
   user: User | undefined,
   tripTravellers: TravellerProfile[] = [],
 ) => {

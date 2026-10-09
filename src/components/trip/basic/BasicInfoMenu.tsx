@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSurmaiContext } from '../../../app/useSurmaiContext.ts';
 import {
   deleteTrip,
-  listActivities,
+  listPlannedActivities,
   listLodgings,
   listTransportations,
   listTripTravellerProfiles,
@@ -189,7 +189,7 @@ export const BasicInfoMenu = ({ trip, refetch }: { trip: Trip; refetch: () => vo
             const [transportations, lodgings, activities, tripTravellers] = await Promise.all([
               listTransportations(trip.id),
               listLodgings(trip.id),
-              listActivities(trip.id),
+              listPlannedActivities(trip.id),
               listTripTravellerProfiles(trip.travellers || []),
             ]);
             const { downloadDailyItinerary } = await loadPdfGenerator();
@@ -204,7 +204,7 @@ export const BasicInfoMenu = ({ trip, refetch }: { trip: Trip; refetch: () => vo
             const [transportations, lodgings, activities, tripTravellers] = await Promise.all([
               listTransportations(trip.id),
               listLodgings(trip.id),
-              listActivities(trip.id),
+              listPlannedActivities(trip.id),
               listTripTravellerProfiles(trip.travellers || []),
             ]);
             const { downloadFullItinerary } = await loadPdfGenerator();

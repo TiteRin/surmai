@@ -38,6 +38,7 @@ export {
 
 export {
   listActivities,
+  listPlannedActivities,
   listActivitiesByYear,
   createActivityEntry,
   updateActivityEntry,

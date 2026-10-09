@@ -81,6 +81,7 @@ type Activity struct {
 	Cost                 *Cost           `json:"cost"`
 	StartDate            types.DateTime  `json:"startDate"`
 	EndDate              types.DateTime  `json:"endDate"`
+	Status               string          `json:"status"`
 	Attachments          []*UploadedFile `json:"attachments"`
 	AttachmentReferences []string        `json:"attachmentReferences"`
 	Metadata             map[string]any  `json:"metadata"`

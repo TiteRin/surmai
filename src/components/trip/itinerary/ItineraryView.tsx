@@ -9,15 +9,22 @@ import { ActivityLine } from './ActivityLine.tsx';
 import { buildActivitiesIndex, buildLodgingIndex, buildTransportationIndex, compareItineraryLine } from './helper.ts';
 import { LodgingLine } from './LodgingLine.tsx';
 import { TransportationLine } from './TransportationLine.tsx';
-import { listActivities, listLodgings, listTransportations } from '../../../lib/api';
+import { listLodgings, listPlannedActivities, listTransportations } from '../../../lib/api';
 
-import type { Activity, ItineraryLine, Lodging, Transportation, TravellerProfile, Trip } from '../../../types/trips.ts';
+import type {
+  ItineraryLine,
+  Lodging,
+  PlannedActivity,
+  Transportation,
+  TravellerProfile,
+  Trip,
+} from '../../../types/trips.ts';
 
 const getDailyItinerary = (
   day: string,
   transportationItinerary: { [key: string]: Array<Transportation> },
   lodgingsItinerary: { [key: string]: Array<Lodging> },
-  activitiesItinerary: { [key: string]: Array<Activity> }
+  activitiesItinerary: { [key: string]: Array<PlannedActivity> }
 ): Array<ItineraryLine> => {
   const d = dayjs(day);
   const daily = [
@@ -33,7 +40,7 @@ const getItineraryForDuration = (
   endDay: string,
   transportationItinerary: { [key: string]: Array<Transportation> },
   lodgingsItinerary: { [key: string]: Array<Lodging> },
-  activitiesItinerary: { [key: string]: Array<Activity> }
+  activitiesItinerary: { [key: string]: Array<PlannedActivity> }
 ): Record<PropertyKey, ItineraryLine[] | undefined> => {
   let expanded: ItineraryLine[] = [];
   for (let m = dayjs(startDay); m.isBefore(endDay) || m.isSame(endDay); m = m.add(1, 'day')) {
@@ -51,10 +58,10 @@ export const ItineraryView = ({ trip, tripTravellers = [] }: { trip: Trip; tripT
   const tripId = trip.id;
   const { t } = useTranslation();
 
-  const { data: activities } = useQuery<{ [key: string]: Activity[] }>({
+  const { data: activities } = useQuery<{ [key: string]: PlannedActivity[] }>({
     queryKey: ['buildActivitiesIndex', tripId],
     queryFn: async () => {
-      const activitiesResult = await listActivities(tripId || '');
+      const activitiesResult = await listPlannedActivities(tripId || '');
       return buildActivitiesIndex(activitiesResult);
     },
   });
@@ -143,7 +150,7 @@ export const ItineraryView = ({ trip, tripTravellers = [] }: { trip: Trip; tripT
                           )}
                           {entry.itineraryType === 'activity' && (
                             <ActivityLine
-                              activity={entry as Activity}
+                              activity={entry as PlannedActivity}
                               day={entry.day}
                               tripTravellers={tripTravellers}
                             />

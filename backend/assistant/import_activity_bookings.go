@@ -66,6 +66,7 @@ func saveActivity(txApp core.App, msg *bt.Email, trip *bt.Trip, activity *bt.Ema
 	entity.Set("confirmationCode", activity.ConfirmationCode)
 	entity.Set("startDate", start)
 	entity.Set("endDate", end)
+	entity.Set("status", "planned")
 	entity.Set("expenseId", expenseId)
 	entity.Set("attachmentReferences", attachmentIds)
 	entity.Set("metadata", metadata)

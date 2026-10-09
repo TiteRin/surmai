@@ -2,11 +2,29 @@ import { deleteAttachment } from './attachments.ts';
 import { pb } from './pocketbase.ts';
 import { convertSavedToBrowserDate } from '../../time.ts';
 
-import type { Activity, CreateActivity } from '../../../types/trips.ts';
+import type { Activity, CreateActivity, PlannedActivity } from '../../../types/trips.ts';
 
 const activities = pb.collection('activities');
 export const listActivities = async (tripId?: string): Promise<Activity[]> => {
   const filter = tripId ? `trip="${tripId}"` : undefined;
+  const results = await activities.getList(1, 1000, {
+    filter,
+    sort: 'startDate',
+  });
+
+  // @ts-expect-error type is correct
+  return results.items.map((entry) => {
+    return {
+      ...entry,
+      startDate: convertSavedToBrowserDate(entry.startDate),
+      endDate: convertSavedToBrowserDate(entry.endDate),
+    };
+  });
+};
+
+export const listPlannedActivities = async (tripId?: string): Promise<PlannedActivity[]> => {
+  const plannedFilter = 'status="planned"';
+  const filter = tripId ? `trip="${tripId}"&&${plannedFilter}` : `${plannedFilter}`;
   const results = await activities.getList(1, 1000, {
     filter,
     sort: 'startDate',

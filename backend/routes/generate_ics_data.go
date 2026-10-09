@@ -303,7 +303,7 @@ func getDestinations(trip *core.Record) []bt.Destination {
 
 func exportActivities(e core.App, trip *core.Record) []*bt.Activity {
 	activities, _ := e.FindAllRecords("activities",
-		dbx.NewExp("trip = {:tripId}", dbx.Params{"tripId": trip.Id}))
+		dbx.NewExp("trip = {:tripId} AND status = 'planned'", dbx.Params{"tripId": trip.Id}))
 
 	var payload []*bt.Activity
 	for _, l := range activities {
