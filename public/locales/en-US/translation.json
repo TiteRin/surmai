@@ -460,6 +460,7 @@
   "reset_request_submitted": "Your password reset request has been submitted.",
   "return_rental_car": "Return rental car to {{ destination }}",
   "save": "Save",
+  "save_as_draft": "Save as Draft",
   "scroll_to_zoom": "Scroll to zoom",
   "search_results": "Search Results",
   "seats": "Seats",

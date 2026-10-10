@@ -14,7 +14,14 @@ import { AttachmentsUploadField } from '../attachments/AttachmentsUploadField.ts
 import { TravellerMultiSelect } from '../TravellerMultiSelect.tsx';
 
 import type { SaveEntityPayload } from '../../../lib/api';
-import type { Activity, ActivityFormSchema, Attachment, Expense, TravellerProfile, Trip } from '../../../types/trips.ts';
+import type {
+  Activity,
+  ActivityFormSchema,
+  Attachment,
+  Expense,
+  TravellerProfile,
+  Trip,
+} from '../../../types/trips.ts';
 import type { UseFormReturnType } from '@mantine/form';
 
 export const GenericActivityForm = ({
@@ -52,14 +59,45 @@ export const GenericActivityForm = ({
       currencyCode: expense?.cost?.currency || user?.currencyCode || 'USD',
       startDate: activity?.startDate,
       endDate: activity?.endDate,
-      status: activity?.status || "planned",
+      status: activity?.status || 'planned',
       link: activity?.link,
       place: activity?.metadata?.place,
       travellers: activity?.travellers || [],
     },
   });
 
+  const onSubmit = () => {
+    const values = form.getValues();
+
+    const errors: Record<string, string> = {};
+    if (!values.name) errors.name = t('activity_name_required', 'Name is required');
+    if (!values.place) errors.place = t('activity_destination_required', 'Destination is required');
+    if (!values.address) errors.address = t('activity_address_required', 'Address is required');
+    if (!values.startDate) errors.startDate = t('activity_start_date_required', 'Start date is required');
+    if (!values.endDate) errors.endDate = t('activity_end_date_required', 'End date is required');
+    if (Object.keys(errors).length) {
+      form.setErrors(errors);
+      return;
+    }
+
+    void handleFormSubmit({ ...values, status: 'planned'});
+  };
+
+  const onSaveAsDraft = () => {
+    const values = form.getValues();
+
+    const errors: Record<string, string> = {};
+    if (!values.name) errors.name = t('activity_name_required', 'Name is required');
+    if (Object.keys(errors).length) {
+      form.setErrors(errors);
+      return;
+    }
+
+    void handleFormSubmit({ ...values, status: 'draft' });
+  };
+
   const handleFormSubmit = async (values: ActivityFormSchema) => {
+
     setSaving(true);
 
     try {
@@ -167,7 +205,7 @@ export const GenericActivityForm = ({
               'aria-label': 'Submit Date',
             }}
             timePickerProps={{
-              format: getTimePickerFormat(user)
+              format: getTimePickerFormat(user),
             }}
           />
         </Grid.Col>
@@ -189,7 +227,7 @@ export const GenericActivityForm = ({
               'aria-label': 'Submit Date',
             }}
             timePickerProps={{
-              format: getTimePickerFormat(user)
+              format: getTimePickerFormat(user),
             }}
           />
         </Grid.Col>
@@ -226,10 +264,7 @@ export const GenericActivityForm = ({
         </Grid.Col>
       </Grid>
 
-      <Group justify={'flex-end'} pt={'lg'}>
-        <Button type={'submit'} loading={saving} w={'min-content'}>
-          {t('save', 'Save')}
-        </Button>
+      <Group justify={'space-between'} pt={'lg'}>
         <Button
           type={'button'}
           variant={'default'}
@@ -240,6 +275,29 @@ export const GenericActivityForm = ({
         >
           {t('cancel', 'Cancel')}
         </Button>
+        <Button.Group>
+          <Button
+            type={'button'}
+            loading={saving}
+            w={'min-content'}
+            variant={'outline'}
+            onClick={() => {
+              onSaveAsDraft();
+            }}
+          >
+            {t('save_as_draft', 'Save as Draft')}
+          </Button>
+          <Button
+            type={'button'}
+            loading={saving}
+            w={'min-content'}
+            onClick={() => {
+              onSubmit();
+            }}
+          >
+            {t('save', 'Save')}
+          </Button>
+        </Button.Group>
       </Group>
     </form>
   );
