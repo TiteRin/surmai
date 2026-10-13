@@ -163,10 +163,8 @@ export class ViewTripPage {
     }
 
     if (transportationData.attachment) {
-      const fileChooserPromise = this.page.waitForEvent('filechooser');
-      await this.page.getByRole('button', { name: 'Upload' }).click();
-      const fileChooser = await fileChooserPromise;
-      await fileChooser.setFiles(transportationData.attachment);
+      // The attachments field is a dropzone, feed its hidden file input directly
+      await this.page.locator('.mantine-Dropzone-root input[type="file"]').setInputFiles(transportationData.attachment);
     }
 
     // Save the transportation
