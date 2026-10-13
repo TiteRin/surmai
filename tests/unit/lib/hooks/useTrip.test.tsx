@@ -39,6 +39,17 @@ describe('useTrip', () => {
     expect(queryClient.getQueryData(['trip', 'trip-1'])).toEqual(trip);
   });
 
+  it('calls the api only once when the trip is requested multiple times', async () => {
+    const queryClient = createTestQueryClient();
+    const { result: firstCall } = renderHook(() => useTrip('trip-1'), { wrapper: createQueryWrapper(queryClient) });
+    const { result: secondCall } = renderHook(() => useTrip('trip-1'), { wrapper: createQueryWrapper(queryClient) });
+
+    await waitFor(() => expect(firstCall.current.isPending).toBe(false));
+    await waitFor(() => expect(secondCall.current.isPending).toBe(false));
+
+    expect(api.getTrip).toHaveBeenCalledTimes(1);
+  });
+
   it('exposes the error when the trip cannot be loaded', async () => {
     const failure = new Error('not found');
     vi.mocked(api.getTrip).mockRejectedValue(failure);
