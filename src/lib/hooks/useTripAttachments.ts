@@ -6,11 +6,11 @@ import { getTripAttachments } from '../api';
 import type { Attachment } from '../../types/trips.ts';
 
 export const useTripAttachments = (tripId?: string) => {
-  const { data, isPending } = useQuery<Attachment[]>({
+  const { data, isPending, refetch } = useQuery<Attachment[]>({
     queryKey: ['getTripAttachments', tripId],
     queryFn: () => getTripAttachments(tripId || ''),
     staleTime: TRIP_DATA_STALE_TIME,
   });
 
-  return { tripAttachments: data || [], isPending };
+  return { tripAttachments: data || [], isPending, refetch };
 };

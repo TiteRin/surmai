@@ -32,22 +32,22 @@ describe('useTripTravellers', () => {
   it('returns an empty list while the travellers are loading', async () => {
     const { result } = renderHook(() => useTripTravellers(trip), { wrapper: createQueryWrapper() });
 
-    expect(result.current).toEqual([]);
+    expect(result.current.tripTravellers).toEqual([]);
 
-    await waitFor(() => expect(result.current).toEqual(travellers));
+    await waitFor(() => expect(result.current.tripTravellers).toEqual(travellers));
   });
 
   it('loads the profiles of the travellers of the trip', async () => {
     const { result } = renderHook(() => useTripTravellers(trip), { wrapper: createQueryWrapper() });
 
-    await waitFor(() => expect(result.current).toEqual(travellers));
+    await waitFor(() => expect(result.current.tripTravellers).toEqual(travellers));
     expect(api.listTripTravellerProfiles).toHaveBeenCalledWith(['traveller-1', 'traveller-2']);
   });
 
   it('does not fetch anything until the trip is available', () => {
     const { result } = renderHook(() => useTripTravellers(undefined), { wrapper: createQueryWrapper() });
 
-    expect(result.current).toEqual([]);
+    expect(result.current.tripTravellers).toEqual([]);
     expect(api.listTripTravellerProfiles).not.toHaveBeenCalled();
   });
 
@@ -57,14 +57,14 @@ describe('useTripTravellers', () => {
 
     const { result } = renderHook(() => useTripTravellers(trip), { wrapper: createQueryWrapper(queryClient) });
 
-    expect(result.current).toEqual(travellers);
+    expect(result.current.tripTravellers).toEqual(travellers);
     expect(api.listTripTravellerProfiles).not.toHaveBeenCalled();
   });
 
   it('does not fetch again when another consumer mounts right after the data was loaded', async () => {
     const wrapper = createQueryWrapper();
     const first = renderHook(() => useTripTravellers(trip), { wrapper });
-    await waitFor(() => expect(first.result.current).not.toHaveLength(0));
+    await waitFor(() => expect(first.result.current.tripTravellers).not.toHaveLength(0));
 
     renderHook(() => useTripTravellers(trip), { wrapper });
 
@@ -75,7 +75,7 @@ describe('useTripTravellers', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     const wrapper = createQueryWrapper();
     const first = renderHook(() => useTripTravellers(trip), { wrapper });
-    await waitFor(() => expect(first.result.current).not.toHaveLength(0));
+    await waitFor(() => expect(first.result.current.tripTravellers).not.toHaveLength(0));
 
     vi.setSystemTime(Date.now() + TRIP_DATA_STALE_TIME + 1);
     renderHook(() => useTripTravellers(trip), { wrapper });

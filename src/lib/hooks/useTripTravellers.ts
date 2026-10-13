@@ -13,5 +13,5 @@ export const useTripTravellers = (trip?: Trip) => {
     enabled: !!trip,
   });
 
-  return tripTravellers;
+  return { tripTravellers };
 };

@@ -7,7 +7,7 @@ import { listExpenses } from '../api';
 import type { Expense } from '../../types/trips.ts';
 
 export const useTripExpenseMap = (tripId?: string) => {
-  const { data: expenses, isPending } = useQuery<Expense[]>({
+  const { data: expenses, isPending, refetch } = useQuery<Expense[]>({
     queryKey: ['listExpenses', tripId],
     queryFn: () => listExpenses(tripId || ''),
     staleTime: TRIP_DATA_STALE_TIME,
@@ -21,5 +21,5 @@ export const useTripExpenseMap = (tripId?: string) => {
     return map;
   }, [expenses]);
 
-  return { expenseMap, isPending };
+  return { expenseMap, isPending, refetch };
 };

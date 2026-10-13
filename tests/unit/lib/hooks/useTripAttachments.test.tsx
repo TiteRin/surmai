@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as api from '../../../../src/lib/api';
@@ -90,5 +90,16 @@ describe('useTripAttachments', () => {
     renderHook(() => useTripAttachments('trip-1'), { wrapper });
 
     await waitFor(() => expect(api.getTripAttachments).toHaveBeenCalledTimes(2));
+  });
+
+  it('fetches again when refetch is called', async () => {
+    const wrapper = createQueryWrapper();
+    const { result } = renderHook(() => useTripAttachments('trip-1'), { wrapper });
+
+    await waitFor(() => expect(result.current.isPending).toBe(false));
+
+    await act(() => result.current.refetch());
+
+    expect(api.getTripAttachments).toHaveBeenCalledTimes(2);
   });
 });

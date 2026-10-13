@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as api from '../../../../src/lib/api';
@@ -89,5 +89,20 @@ describe('useTripExpenseMap', () => {
     renderHook(() => useTripExpenseMap('trip-1'), { wrapper });
 
     await waitFor(() => expect(api.listExpenses).toHaveBeenCalledTimes(2));
+  });
+
+  it('reinitializes the map after a refetch when the expenses have changed', async () => {
+    const wrapper = createQueryWrapper();
+    const { result } = renderHook(() => useTripExpenseMap('trip-1'), { wrapper });
+    await waitFor(() => expect(result.current.expenseMap.size).toBe(2));
+    const firstMap = result.current.expenseMap;
+
+    vi.mocked(api.listExpenses).mockResolvedValue([expenses[0]]);
+    await act(() => result.current.refetch());
+
+    await waitFor(() => expect(result.current.expenseMap.size).toBe(1));
+    expect(result.current.expenseMap).not.toBe(firstMap);
+    expect(result.current.expenseMap.get('expense-1')).toEqual(expenses[0]);
+    expect(result.current.expenseMap.has('expense-2')).toBe(false);
   });
 });
