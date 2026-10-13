@@ -25,6 +25,7 @@ tests/playwright/.auth
 *.sln
 *.sw?
 test-results
+test-reports
 backend/pb_data
 backend/pb_test_data
 backend/pb_preview_data
