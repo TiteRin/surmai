@@ -12,14 +12,15 @@ import { Header } from '../../components/nav/Header.tsx';
 import { TripAttachments } from '../../components/trip/attachments/TripAttachments.tsx';
 import { ExpensesPanel } from '../../components/trip/expenses/ExpensesPanel.tsx';
 import { ItineraryView } from '../../components/trip/itinerary/ItineraryView.tsx';
+import { ActivitiesView } from '../../components/trip/activities/ActivitiesView.tsx';
 import { TripNotes } from '../../components/trip/notes/TripNotes.tsx';
 import { OrganizationTab } from '../../components/trip/OrganizationTab.tsx';
 import { getTrip, getTripAttachments, listExpenses, listTripTravellerProfiles } from '../../lib/api';
 import { usePageTitle } from '../../lib/hooks/usePageTitle.ts';
+
 import { formatDate, formatDateTime } from '../../lib/time.ts';
 
 import type { Attachment, Expense, TravellerProfile, Trip } from '../../types/trips.ts';
-
 import { TabsList } from '../../components/util/TabsList.tsx';
 import { useCurrentUser } from '../../auth/useCurrentUser.ts';
 import './ViewTrip.module.css';
@@ -85,7 +86,10 @@ export const ViewTrip = () => {
       key: 'organization',
       value: t('organization', 'Organization'),
     },
-
+    {
+      key: 'activities',
+      value: t('activities', 'Activities'),
+    },
     {
       key: 'itinerary',
       value: t('itinerary', 'Itinerary'),
@@ -198,6 +202,15 @@ export const ViewTrip = () => {
               await refetchAttachments();
               await refetchExpenses();
             }}
+          />
+        </Tabs.Panel>
+        <Tabs.Panel value="activities">
+          <ActivitiesView
+            trip={trip}
+            tripAttachments={tripAttachments}
+            expenseMap={expenseMap}
+            tripTravellers={tripTravellers}
+            refetchTrip={refetchTrip}
           />
         </Tabs.Panel>
         <Tabs.Panel value="itinerary">
