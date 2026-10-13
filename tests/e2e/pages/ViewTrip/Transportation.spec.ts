@@ -18,9 +18,9 @@ test.describe('Trip Transportation', () => {
   let tempFilePath: string;
 
   test.beforeAll(async ({ browser }) => {
-    // Create a temporary file for attachment testing
-    tempFilePath = path.join(__dirname, 'test-attachment.txt');
-    fs.writeFileSync(tempFilePath, 'This is a test attachment for transportation');
+    // Create a temporary file for attachment testing (the upload field only accepts images and PDFs)
+    tempFilePath = path.join(__dirname, 'test-attachment.pdf');
+    fs.writeFileSync(tempFilePath, '%PDF-1.4\n% This is a test attachment for transportation\n%%EOF\n');
 
     // Create a new context and page for trip creation
     const context = await browser.newContext({
@@ -173,9 +173,9 @@ test.describe('Trip Transportation', () => {
     await expect(page.getByText(trainName)).toBeVisible();
 
     // Verify the attachment is visible in the transportation section
-    await expect(page.getByRole('link', { name: 'test-attachment.txt' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'test-attachment.pdf' })).toBeVisible();
 
     // Check that the attachment is also visible in the Attachments tab
-    await viewTripPage.checkAttachmentVisible('test-attachment.txt');
+    await viewTripPage.checkAttachmentVisible('test-attachment.pdf');
   });
 });

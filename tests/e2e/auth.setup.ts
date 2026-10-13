@@ -1,13 +1,42 @@
-import { test as setup } from '@playwright/test';
+import { expect, test as setup } from '@playwright/test';
 import * as path from 'path';
 
 const __dirname = import.meta.dirname;
 const storageState = path.join(__dirname, '../playwright/.auth/user.json');
 
-setup('authenticate', async ({ page }) => {
-  const email = 'admin@test.surmai.app';
-  const password = 'uf3u2uo3f3uuo23#$#WAIT';
+const backendUrl = 'http://127.0.0.1:8060';
+const email = 'admin@test.surmai.app';
+const password = 'uf3u2uo3f3uuo23#$#WAIT';
 
+// Traveller profiles the specs can assign to a trip
+const travellerProfiles = [
+  { legalName: 'John Doe', email: 'john.doe@test.surmai.app' },
+  { legalName: 'Jane Smith', email: 'jane.smith@test.surmai.app' },
+  { legalName: 'Test User', email: 'test.user@test.surmai.app' },
+];
+
+setup('seed traveller profiles', async ({ request }) => {
+  const authResponse = await request.post(`${backendUrl}/api/collections/users/auth-with-password`, {
+    data: { identity: email, password },
+  });
+  expect(authResponse.ok()).toBeTruthy();
+  const { token, record } = await authResponse.json();
+  const headers = { Authorization: token };
+  const profilesUrl = `${backendUrl}/api/collections/traveller_profiles/records`;
+
+  const listResponse = await request.get(profilesUrl, { headers, params: { perPage: 200 } });
+  expect(listResponse.ok()).toBeTruthy();
+  const existingEmails = (await listResponse.json()).items.map((p: { email: string }) => p.email);
+
+  // The test database is kept between runs, only create what is missing
+  for (const profile of travellerProfiles) {
+    if (existingEmails.includes(profile.email)) continue;
+    const createResponse = await request.post(profilesUrl, { headers, data: { ...profile, ownerId: record.id } });
+    expect(createResponse.ok()).toBeTruthy();
+  }
+});
+
+setup('authenticate', async ({ page }) => {
   // Navigate to the login page
   await page.goto(`/login`);
 

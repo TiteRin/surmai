@@ -71,7 +71,7 @@ test.describe('Trip Activities', () => {
     });
 
     // Verify the activity was added
-    await expect(page.getByLabel('Organization').getByText(activityName)).toBeVisible();
+    await expect(page.getByLabel('Activities').getByText(activityName)).toBeVisible();
   });
 
   test('should add a restaurant reservation activity', async ({ page }) => {
@@ -89,7 +89,7 @@ test.describe('Trip Activities', () => {
     });
 
     // Verify the activity was added
-    await expect(page.getByLabel('Organization').getByText(activityName)).toBeVisible();
+    await expect(page.getByLabel('Activities').getByText(activityName)).toBeVisible();
   });
 
   test('should add a guided tour activity', async ({ page }) => {
@@ -107,7 +107,7 @@ test.describe('Trip Activities', () => {
     });
 
     // Verify the activity was added
-    await expect(page.getByLabel('Organization').getByText(activityName)).toBeVisible();
+    await expect(page.getByLabel('Activities').getByText(activityName)).toBeVisible();
   });
 
   test('should add a free time activity', async ({ page }) => {
@@ -124,6 +124,6 @@ test.describe('Trip Activities', () => {
     });
 
     // Verify the activity was added
-    await expect(page.getByLabel('Organization').getByText(activityName)).toBeVisible();
+    await expect(page.getByLabel('Activities').getByText(activityName)).toBeVisible();
   });
 });

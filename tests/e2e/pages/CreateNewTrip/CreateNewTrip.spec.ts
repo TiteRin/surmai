@@ -36,8 +36,14 @@ test.describe('Create New Trip Page', () => {
     });
 
     // Submit the form
+    const createResponsePromise = page.waitForResponse(
+      (response) => /api\/collections\/trips\/records/.test(response.url()) && response.request().method() === 'POST'
+    );
     await createNewTripPage.clickCreateTripButton();
-    await page.waitForResponse(/api\/collections\/trips\/records/);
+    const createdTrip = await (await createResponsePromise).json();
+
+    // Check that the selected travelers were saved with the trip
+    expect(createdTrip.travellers).toHaveLength(2);
 
     // Check that we've navigated to the trip detail page
     // await expect(page.url()).toContain('/trips/test-trip-id');

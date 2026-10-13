@@ -28,7 +28,7 @@ export class ViewTripPage {
   /**
    * Switch to a specific tab
    */
-  async switchToTab(tabName: 'Organization' | 'Itinerary' | 'Attachments' | 'Notes') {
+  async switchToTab(tabName: 'Organization' | 'Activities' | 'Itinerary' | 'Attachments' | 'Notes') {
     await this.page.getByRole('tab', { name: tabName }).click();
   }
 
@@ -55,7 +55,7 @@ export class ViewTripPage {
   /**
    * Open an accordion section in the Organization tab
    */
-  async openAccordionSection(sectionName: 'Basic Information' | 'Transportation' | 'Lodging' | 'Activities') {
+  async openAccordionSection(sectionName: 'Basic Information' | 'Transportation' | 'Lodging') {
     // First make sure we're on the Organization tab
     await this.switchToTab('Organization');
 
@@ -163,10 +163,8 @@ export class ViewTripPage {
     }
 
     if (transportationData.attachment) {
-      const fileChooserPromise = this.page.waitForEvent('filechooser');
-      await this.page.getByRole('button', { name: 'Upload' }).click();
-      const fileChooser = await fileChooserPromise;
-      await fileChooser.setFiles(transportationData.attachment);
+      // The attachments field is a dropzone, feed its hidden file input directly
+      await this.page.locator('.mantine-Dropzone-root input[type="file"]').setInputFiles(transportationData.attachment);
     }
 
     // Save the transportation
@@ -226,8 +224,8 @@ export class ViewTripPage {
     destinationName: string;
     description?: string;
   }) {
-    // Open the activities section
-    await this.openAccordionSection('Activities');
+    // Activities live in their own tab
+    await this.switchToTab('Activities');
 
     // Click the Add Activity button
     await this.page.getByRole('button', { name: 'Add Activity' }).click();
@@ -258,8 +256,8 @@ export class ViewTripPage {
    * Add an activity with only a name and save it as a draft
    */
   async addDraftActivity(activityData: { name: string; description?: string }) {
-    // Open the activities section
-    await this.openAccordionSection('Activities');
+    // Activities live in their own tab
+    await this.switchToTab('Activities');
 
     // Click the Add Activity button
     await this.page.getByRole('button', { name: 'Add Activity' }).click();
@@ -277,11 +275,11 @@ export class ViewTripPage {
   }
 
   /**
-   * Get the card displaying an activity in the Organization tab
+   * Get the card displaying an activity in the Activities tab
    */
   getActivityCard(activityName: string) {
     return this.page
-      .getByLabel('Organization')
+      .getByLabel('Activities')
       .locator('.mantine-Paper-root')
       .filter({ has: this.page.getByRole('heading', { name: activityName, exact: true }) });
   }

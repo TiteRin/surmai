@@ -67,10 +67,16 @@ export class CreateNewTripPage {
     }
 
     // Add participants
+    // Travelers can only be picked among existing traveller profiles (seeded in auth.setup.ts)
+    const travellers = this.page.getByRole('combobox', { name: 'Travelers' });
     for (const participant of data.participants) {
-      await this.page.getByRole('textbox', { name: 'Travelers' }).click();
-      await this.page.getByRole('textbox', { name: 'Travelers' }).fill(participant);
-      await this.page.keyboard.press('Enter');
+      await travellers.click();
+      await travellers.fill(participant);
+      await this.page.getByRole('option', { name: participant }).click();
+    }
+    if (data.participants.length > 0) {
+      // Close the dropdown so it does not cover the rest of the form
+      await this.page.keyboard.press('Escape');
     }
   }
 
