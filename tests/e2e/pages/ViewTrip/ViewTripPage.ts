@@ -292,6 +292,13 @@ export class ViewTripPage {
     await this.page.getByRole('menuitem', { name: action }).click();
   }
 
+  async openActivityFilters() {
+    await this.page.getByRole('button', { name: 'Filters' }).click();
+  }
+
+  async applyActivityFilters() {
+    await this.page.getByRole('button', { name: 'Apply Filters' }).click();
+  }
   /**
    * Add a note to the trip
    */
