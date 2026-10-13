@@ -1,4 +1,4 @@
-import { Box, Grid, Modal, rem, Text, Anchor } from '@mantine/core';
+import { Box, Grid, Modal, rem, Text, Anchor, Divider, Badge, Group, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
 import { IconActivity } from '@tabler/icons-react';
@@ -98,9 +98,24 @@ export const GenericActivityData = ({
           }}
         />
       </Modal>
+      <Group
+        component={'div'}
+        p={'xs'}
+        style={{
+          backgroundColor: 'inherit',
+        }}
+      >
+        <Title size="md">{activity.name}</Title>
+        {activity.status === 'draft' && (
+          <Badge size={'xs'} variant={'light'}>
+            Draft
+          </Badge>
+        )}
+      </Group>
+      <Divider />
       <Grid align={'top'} p={'xs'} grow={false}>
-        <Grid.Col span={{ base: 12, sm: 12, md: 1, lg: 1 }} p={'md'}>
-          <Box component="div" visibleFrom={'md'}>
+        <Grid.Col span={{ base: 12, sm: 12, md: 1, lg: 1 }} p={'md'} visibleFrom={'md'}>
+          <Box component="div">
             <IconActivity
               size={'var(--mantine-font-size-xs)'}
               stroke={0.5}
@@ -111,15 +126,6 @@ export const GenericActivityData = ({
               }}
             />
           </Box>
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 2 }}>
-          <Text size="xs" c={'dimmed'}>
-            {t('lodging_name', 'Name')}
-          </Text>
-          <Text size="md">{activity.name}</Text>
-          <Text size="sm" c={'dimmed'} lineClamp={1}>
-            {activity.description}
-          </Text>
         </Grid.Col>
         <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 1.5 }}>
           <Text size="xs" c={'dimmed'}>
@@ -133,7 +139,7 @@ export const GenericActivityData = ({
           )}
           {!activity.startDate && <Text size="md">{t('start_date_not_set', 'Not Set')}</Text>}
         </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 2 }}>
+        <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 1.5 }}>
           <Text size="xs" c={'dimmed'}>
             {t('activity_end_date', 'End Date')}
           </Text>
@@ -145,8 +151,13 @@ export const GenericActivityData = ({
           )}
           {!activity.endDate && <Text size="md">{t('end_date_not_set', 'Not Set')}</Text>}
         </Grid.Col>
-
-        <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 3 }}>
+        <Grid.Col span={{ base: 12, sm: 6, md: 3, lg: 4 }}>
+          <Text size="xs" c={'dimmed'}>
+            {t('activity_desc', 'Description')}
+          </Text>
+          <Text lineClamp={2}>{activity.description}</Text>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 2.5 }}>
           <Text size="xs" c={'dimmed'}>
             {t('lodging_address', 'Address')}
           </Text>
@@ -156,7 +167,7 @@ export const GenericActivityData = ({
             </Anchor>
           )}
         </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 6, md: 2, lg: 2 }}>
+        <Grid.Col span={{ base: 12, sm: 6, md: 1.5, lg: 1.5 }}>
           <Text size="xs" c={'dimmed'}>
             {t('cost', 'Cost')}
           </Text>

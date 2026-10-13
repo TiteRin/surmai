@@ -23,8 +23,11 @@ export const DataLine = ({
   const { t } = useTranslation();
 
   return (
-    <Paper withBorder pos={'relative'}>
-      <Group pos={'absolute'} right={'5px'} top={'2px'}>
+    <Paper
+      withBorder
+      pos={'relative'}
+    >
+      <Group pos={'absolute'} right={'5px'} top={'5px'}>
         <Menu position="bottom-start" onClose={() => setMenuOpened(false)} onOpen={() => setMenuOpened(true)}>
           <Menu.Target>
             <ActionIcon variant={'transparent'} p={'2px'}>
