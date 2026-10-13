@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listActivities } from '../../../lib/api';
-import { Card, Container, Flex, Group, LoadingOverlay, Modal, Stack, Text, Title } from '@mantine/core';
+import { Card, Container, Flex, Group, LoadingOverlay, Modal, Stack, Text } from '@mantine/core';
 import { useSurmaiContext } from '../../../app/useSurmaiContext.ts';
 import { useDisclosure } from '@mantine/hooks';
 import { GenericActivityForm } from './GenericActivityForm.tsx';

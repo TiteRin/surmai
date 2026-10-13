@@ -178,7 +178,7 @@ export const GenericActivityData = ({
       {attachments && (
         <Attachments
           attachments={attachments}
-          onDelete={(attachmentId) => {
+          onDelete={async (attachmentId) => {
             return deleteActivityAttachments(activity.id, attachmentId).then(() => refetch());
           }}
         />
