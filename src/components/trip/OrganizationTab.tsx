@@ -1,13 +1,20 @@
 import { Accordion, Group, rem, Text } from '@mantine/core';
-import { IconBed, IconCalendar, IconInfoSquare, IconPlane } from '@tabler/icons-react';
+import { IconBed, IconInfoSquare, IconPlane } from '@tabler/icons-react';
 import { t } from 'i18next';
 
-import { ActivitiesPanel } from './activities/ActivitiesPanel';
 import { BasicInfo } from './basic/BasicInfo';
 import { LodgingPanel } from './lodging/LodgingPanel';
 import { TransportationPanel } from './transportation/TransportationPanel';
 
 import type { Attachment, Expense, TravellerProfile, Trip } from '../../types/trips';
+
+type OrganizationTabProps = {
+  trip: Trip;
+  tripAttachments: Attachment[];
+  expenseMap: Map<string, Expense>;
+  tripTravellers?: TravellerProfile[];
+  refetchTrip: () => void;
+};
 
 export const OrganizationTab = ({
   trip,
@@ -15,13 +22,7 @@ export const OrganizationTab = ({
   expenseMap,
   tripTravellers = [],
   refetchTrip,
-}: {
-  trip: Trip;
-  tripAttachments: Attachment[];
-  expenseMap: Map<string, Expense>;
-  tripTravellers?: TravellerProfile[];
-  refetchTrip: () => void;
-}) => {
+}: OrganizationTabProps) => {
   return (
     <Accordion chevronPosition="right" variant="separated" multiple={true} mt={'sm'}>
       <Accordion.Item value={'basic_info'} key={'basic_info'}>
@@ -108,38 +109,6 @@ export const OrganizationTab = ({
         </Accordion.Control>
         <Accordion.Panel>
           <LodgingPanel
-            trip={trip}
-            tripAttachments={tripAttachments}
-            expenseMap={expenseMap}
-            tripTravellers={tripTravellers}
-            refetchTrip={refetchTrip}
-          />
-        </Accordion.Panel>
-      </Accordion.Item>
-
-      <Accordion.Item value={'activities'} key={'activities'}>
-        <Accordion.Control
-          icon={
-            <IconCalendar
-              style={{
-                color: 'var(--mantine-primary-color-6)',
-                width: rem(40),
-                height: rem(40),
-              }}
-            />
-          }
-        >
-          <Group wrap="nowrap">
-            <div>
-              <Text>{t('activity_section_name', 'Activities')}</Text>
-              <Text size="sm" c="dimmed" fw={400}>
-                {t('activity_section_description', 'View and edit your activities for this trip')}
-              </Text>
-            </div>
-          </Group>
-        </Accordion.Control>
-        <Accordion.Panel>
-          <ActivitiesPanel
             trip={trip}
             tripAttachments={tripAttachments}
             expenseMap={expenseMap}

@@ -12,7 +12,7 @@ import { Header } from '../../components/nav/Header.tsx';
 import { TripAttachments } from '../../components/trip/attachments/TripAttachments.tsx';
 import { ExpensesPanel } from '../../components/trip/expenses/ExpensesPanel.tsx';
 import { ItineraryView } from '../../components/trip/itinerary/ItineraryView.tsx';
-import { ActivitiesView } from '../../components/trip/activities/ActivitiesView.tsx';
+import { ActivitiesTab } from '../../components/trip/activities/ActivitiesTab.tsx';
 import { TripNotes } from '../../components/trip/notes/TripNotes.tsx';
 import { OrganizationTab } from '../../components/trip/OrganizationTab.tsx';
 import { getTrip, getTripAttachments, listExpenses, listTripTravellerProfiles } from '../../lib/api';
@@ -205,12 +205,16 @@ export const ViewTrip = () => {
           />
         </Tabs.Panel>
         <Tabs.Panel value="activities">
-          <ActivitiesView
+          <ActivitiesTab
             trip={trip}
             tripAttachments={tripAttachments}
             expenseMap={expenseMap}
             tripTravellers={tripTravellers}
-            refetchTrip={refetchTrip}
+            refetchTrip={async () => {
+              await refetchTrip();
+              await refetchAttachments();
+              await refetchExpenses();
+            }}
           />
         </Tabs.Panel>
         <Tabs.Panel value="itinerary">
