@@ -17,6 +17,8 @@
 
 # Surmai
 
+[![Tests](https://github.com/TiteRin/surmai/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/TiteRin/surmai/actions/workflows/tests.yaml?query=branch%3Amain)
+
 Surmai is a personal/family travel organizer.
 The app is built to solve 3 particular challenges while planning a trip:
 
