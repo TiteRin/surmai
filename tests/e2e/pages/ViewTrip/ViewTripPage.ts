@@ -255,6 +255,46 @@ export class ViewTripPage {
   }
 
   /**
+   * Add an activity with only a name and save it as a draft
+   */
+  async addDraftActivity(activityData: { name: string; description?: string }) {
+    // Open the activities section
+    await this.openAccordionSection('Activities');
+
+    // Click the Add Activity button
+    await this.page.getByRole('button', { name: 'Add Activity' }).click();
+
+    // Fill in the name
+    await this.page.getByLabel('Name').fill(activityData.name);
+
+    // Fill in notes if provided
+    if (activityData.description) {
+      await this.page.getByLabel('Description').fill(activityData.description);
+    }
+
+    // Save the activity as a draft
+    await this.page.getByRole('button', { name: 'Save as Draft' }).click();
+  }
+
+  /**
+   * Get the card displaying an activity in the Organization tab
+   */
+  getActivityCard(activityName: string) {
+    return this.page
+      .getByLabel('Organization')
+      .locator('.mantine-Paper-root')
+      .filter({ has: this.page.getByRole('heading', { name: activityName, exact: true }) });
+  }
+
+  /**
+   * Open the menu of an activity card and click one of its actions
+   */
+  async clickActivityMenuItem(activityName: string, action: 'Edit' | 'Delete' | 'View Link') {
+    await this.getActivityCard(activityName).getByRole('button', { name: 'Menu' }).click();
+    await this.page.getByRole('menuitem', { name: action }).click();
+  }
+
+  /**
    * Add a note to the trip
    */
   async addNote(noteText: string) {
