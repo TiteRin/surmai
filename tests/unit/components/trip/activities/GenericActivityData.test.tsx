@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { plannedActivity, draftActivity} from '../../../fixtures.tsx';
 
 import { AuthContext } from '../../../../../src/auth/AuthContext';
 import { GenericActivityData } from '../../../../../src/components/trip/activities/GenericActivityData';
@@ -72,25 +73,6 @@ const trip = {
   endDate: '2026-06-30T00:00:00',
   canUpdate: true,
 } as Trip;
-
-const plannedActivity = {
-  id: 'activity-1',
-  name: 'Visit the Louvre',
-  description: 'See the Mona Lisa',
-  address: 'Louvre Museum, Paris',
-  startDate: '2026-06-10T09:30:00',
-  endDate: '2026-06-10T12:00:00',
-  status: 'planned',
-  trip: 'trip-1',
-} as Activity;
-
-const draftActivity = {
-  id: 'activity-2',
-  name: 'Maybe a boat tour',
-  description: '',
-  status: 'draft',
-  trip: 'trip-1',
-} as Activity;
 
 const tripAttachments: Attachment[] = [
   { id: 'att-1', name: 'ticket.pdf', file: 'ticket_abc.pdf' },
