@@ -297,7 +297,7 @@ export class ViewTripPage {
   }
 
   async applyActivityFilters() {
-    await this.page.getByRole('button', { name: 'Apply Filters' }).click();
+    await this.page.getByRole('button', { name: 'Apply' }).click();
   }
   /**
    * Add a note to the trip

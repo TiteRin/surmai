@@ -1,62 +1,52 @@
 import { expect, test } from '@playwright/test';
-import { CreateNewTripPage, type TripFormData } from '../CreateNewTrip/CreateNewTripPage.ts';
 import dayjs from 'dayjs';
 import { ViewTripPage } from './ViewTripPage.ts';
 // import { getEndDate, getStartDate } from './helper.ts';
 
+const backendUrl = 'http://127.0.0.1:8060';
+
 test.describe('Activities Filter', () => {
 
   let viewTripPage: ViewTripPage;
-  let createNewTripPage: CreateNewTripPage;
   let tripId: string;
-  let tripData: TripFormData;
 
-  test.beforeAll(async ({ browser }) => {
-    // Create a new context and page for trip creation
-    const context = await browser.newContext({
-      storageState: 'tests/playwright/.auth/user.json',
+  // Seed the trip through the API, the UI creation flow is covered by CreateNewTrip specs
+  test.beforeAll(async ({ request }) => {
+    const authResponse = await request.post(`${backendUrl}/api/collections/users/auth-with-password`, {
+      data: { identity: 'admin@test.surmai.app', password: 'uf3u2uo3f3uuo23#$#WAIT' },
     });
-    const page = await context.newPage();
+    expect(authResponse.ok()).toBeTruthy();
+    const { token, record } = await authResponse.json();
 
-    // Initialize the CreateNewTripPage
-    createNewTripPage = new CreateNewTripPage(page);
-
-    // Navigate to the create new trip page
-    await createNewTripPage.goto();
-
-    // Create a new trip
-    tripData = {
-      name: `Activity Data Test Trip ${Date.now()}`,
-      description: 'Test Description for Activity Data tests',
-      startDate: dayjs().startOf('month').format('YYYY-MM-DD'),
-      endDate: dayjs().endOf('month').format('YYYY-MM-DD'),
-      destinations: ['Paris, France', 'Rome, Italy'],
-      participants: [],
-    };
-
-    await createNewTripPage.fillTripForm(tripData);
-    await createNewTripPage.clickCreateTripButton();
-
-    // Wait for navigation and extract the trip ID from the URL
-    await page.waitForTimeout(1000);
-    await page.waitForURL(/\/trips\/[^/]+$/);
-    const url = page.url();
-    tripId = url.split('/').pop() || '';
-
-    // Close the context
-    await context.close();
+    const tripResponse = await request.post(`${backendUrl}/api/collections/trips/records`, {
+      headers: { Authorization: token },
+      data: {
+        name: `Activities Test Trip ${Date.now()}`,
+        description: 'Test Description for Activities tests',
+        startDate: dayjs().startOf('month').format('YYYY-MM-DDTHH:mm:ssZ'),
+        endDate: dayjs().endOf('month').format('YYYY-MM-DDTHH:mm:ssZ'),
+        ownerId: record.id,
+        participants: [{ name: 'Test User' }],
+        destinations: [
+          { id: 'paris', name: 'Paris', countryName: 'France', latitude: '48.8566', longitude: '2.3522', timezone: 'Europe/Paris' },
+          { id: 'rome', name: 'Rome', countryName: 'Italy', latitude: '41.9028', longitude: '12.4964', timezone: 'Europe/Rome' },
+        ],
+      },
+    });
+    expect(tripResponse.ok()).toBeTruthy();
+    tripId = (await tripResponse.json()).id;
   });
 
   test.beforeEach(async ({ page }) => {
     viewTripPage = new ViewTripPage(page);
     await viewTripPage.goto(tripId);
-    viewTripPage.switchToTab('Activities');
+    await viewTripPage.switchToTab('Activities');
   });
 
-  test.fixme("should open and close the activity filters", async ({ page }) => {
+  test("should open and close the activity filters", async ({ page }) => {
     // Open the filter form
     await viewTripPage.openActivityFilters();
-    const filters = page.getByRole('dialog', { name: 'Activity Filters' });
+    const filters = page.getByRole('dialog', { name: 'Filters' });
     await expect(filters).toBeVisible();
 
     // Apply the filters
