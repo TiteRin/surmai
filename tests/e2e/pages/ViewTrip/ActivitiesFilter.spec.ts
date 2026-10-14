@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 import dayjs from 'dayjs';
 import { ViewTripPage } from './ViewTripPage.ts';
-// import { getEndDate, getStartDate } from './helper.ts';
+import { getEndDate, getStartDate } from './helper.ts';
+import { Trip } from '../../../../src/types/trips.ts';
 
 const backendUrl = 'http://127.0.0.1:8060';
 
@@ -9,6 +10,7 @@ test.describe('Activities Filter', () => {
 
   let viewTripPage: ViewTripPage;
   let tripId: string;
+  let trip: Trip;
 
   // Seed the trip through the API, the UI creation flow is covered by CreateNewTrip specs
   test.beforeAll(async ({ request }) => {
@@ -34,7 +36,8 @@ test.describe('Activities Filter', () => {
       },
     });
     expect(tripResponse.ok()).toBeTruthy();
-    tripId = (await tripResponse.json()).id;
+    trip = (await tripResponse).json() as Trip;
+    tripId = trip.id;
   });
 
   test.beforeEach(async ({ page }) => {
@@ -54,29 +57,29 @@ test.describe('Activities Filter', () => {
     await expect(filters).toBeHidden();
   });
 
-  // test.fixme("should filter activities by status", async ({ }) => {
-  //
-  //   const plannedActivityName = 'Visit the Louvre';
-  //   const startDate = getStartDate(tripData.startDate);
-  //   const endDate = getEndDate(startDate, 1);
-  //   await viewTripPage.addActivity({
-  //     name: plannedActivityName,
-  //     startDate,
-  //     endDate,
-  //     destinationName: 'Paris',
-  //     address: 'Louvre Museum, Paris, France',
-  //     description: 'See the Mona Lisa and other famous artworks',
-  //   });
-  //
-  //   const draftActivityName = 'Cooking class';
-  //   await viewTripPage.addDraftActivity({ name: draftActivityName });
-  //
-  //   // Open the filter form
-  //   await viewTripPage.openActivityFilters();
-  //   // Select "Draft"
-  //   await viewTripPage.setStatusFilter("draft");
-  //   // Apply the filters
-  //   await viewTripPage.applyActivityFilters();
-  //
-  // });
+  test.fixme("should filter activities by status", async ({ }) => {
+
+    const plannedActivityName = 'Visit the Louvre';
+    const startDate = getStartDate(trip.startDate);
+    const endDate = getEndDate(startDate, 1);
+    await viewTripPage.addActivity({
+      name: plannedActivityName,
+      startDate,
+      endDate,
+      destinationName: 'Paris',
+      address: 'Louvre Museum, Paris, France',
+      description: 'See the Mona Lisa and other famous artworks',
+    });
+
+    const draftActivityName = 'Cooking class';
+    await viewTripPage.addDraftActivity({ name: draftActivityName });
+
+    // Open the filter form
+    await viewTripPage.openActivityFilters();
+    // Select "Draft"
+    await viewTripPage.setStatusFilter("draft");
+    // Apply the filters
+    await viewTripPage.applyActivityFilters();
+
+  });
 });

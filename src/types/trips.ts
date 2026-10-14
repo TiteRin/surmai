@@ -239,6 +239,8 @@ export const enum LodgingType {
   CAMP_SITE = 'camp_site',
 }
 
+export type ActivityStatus = "draft" | "planned";
+
 export interface Activity extends RecordModel {
   id: string;
   name: string;
@@ -247,7 +249,7 @@ export interface Activity extends RecordModel {
   startDate?: string;
   endDate?: string;
   cost?: Cost;
-  status: 'draft' | 'planned';
+  status: ActivityStatus;
   trip: string;
   attachments?: string[];
   attachmentReferences?: string[];

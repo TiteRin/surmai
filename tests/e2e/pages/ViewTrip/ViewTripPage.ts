@@ -3,6 +3,7 @@ import { expect } from '@playwright/test';
 import { getSelectorString } from './helper.ts';
 
 import type { Page } from '@playwright/test';
+import { ActivityStatus } from '../../../../src/types/trips.ts';
 
 export class ViewTripPage {
   private page: Page;
@@ -299,6 +300,11 @@ export class ViewTripPage {
   async applyActivityFilters() {
     await this.page.getByRole('button', { name: 'Apply' }).click();
   }
+
+  async setStatusFilter(status: ActivityStatus) {
+
+  }
+
   /**
    * Add a note to the trip
    */
