@@ -9,6 +9,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { GenericActivityForm } from './GenericActivityForm.tsx';
 import { AddActivitiesMenu } from './AddActivitiesMenu.tsx';
 import { GenericActivityData } from './GenericActivityData.tsx';
+import { ActivitiesFilter} from './ActivitiesFilter.tsx';
 
 type ActivitiesViewProps = {
   trip: Trip;
@@ -87,6 +88,7 @@ export const ActivitiesTab = ({
           </>
         )}
       </Group>
+      <ActivitiesFilter />
       <Stack mt={'sm'}>
         {data.length === 0 && (
           <Card withBorder>
