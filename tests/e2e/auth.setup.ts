@@ -55,6 +55,10 @@ setup('authenticate', async ({ page }) => {
     await page.context().storageState({ path: storageState as string });
   }
 
+  // Datasets are only needed by specs that search places (trip destinations) or airports (flights)
+  // Slow and needs network access: opt in with E2E_LOAD_DATASETS=1
+  if (!process.env.E2E_LOAD_DATASETS) return;
+
   await page.goto('/settings');
   await page.getByRole('tab', { name: 'Datasets' }).click();
   await page.waitForTimeout(1000);
