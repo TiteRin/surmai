@@ -7,10 +7,12 @@ import { Trip } from '../../../../src/types/trips.ts';
 const backendUrl = 'http://127.0.0.1:8060';
 
 test.describe('Activities Filter', () => {
-
   let viewTripPage: ViewTripPage;
   let tripId: string;
   let trip: Trip;
+
+  const plannedActivityName = 'Visit the Louvre';
+  const draftActivityName = 'Cooking class';
 
   // Seed the trip through the API, the UI creation flow is covered by CreateNewTrip specs
   test.beforeAll(async ({ request }) => {
@@ -30,14 +32,56 @@ test.describe('Activities Filter', () => {
         ownerId: record.id,
         participants: [{ name: 'Test User' }],
         destinations: [
-          { id: 'paris', name: 'Paris', countryName: 'France', latitude: '48.8566', longitude: '2.3522', timezone: 'Europe/Paris' },
-          { id: 'rome', name: 'Rome', countryName: 'Italy', latitude: '41.9028', longitude: '12.4964', timezone: 'Europe/Rome' },
+          {
+            id: 'paris',
+            name: 'Paris',
+            countryName: 'France',
+            latitude: '48.8566',
+            longitude: '2.3522',
+            timezone: 'Europe/Paris',
+          },
+          {
+            id: 'rome',
+            name: 'Rome',
+            countryName: 'Italy',
+            latitude: '41.9028',
+            longitude: '12.4964',
+            timezone: 'Europe/Rome',
+          },
         ],
       },
     });
     expect(tripResponse.ok()).toBeTruthy();
-    trip = (await tripResponse).json() as Trip;
+    trip = (await tripResponse.json()) as Trip;
     tripId = trip.id;
+
+    const activitiesUrl = `${backendUrl}/api/collections/activities/records`;
+    const startDate = getStartDate(trip.startDate);
+    const endDate = getEndDate(startDate, 1);
+    const plannedResponse = await request.post(activitiesUrl, {
+      headers: { Authorization: token },
+      data: {
+        trip: tripId,
+        name: plannedActivityName,
+        description: 'See the Mona Lisa and other famous artworks',
+        address: 'Louvre Museum, Paris, France',
+        startDate: dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+        endDate: dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+        status: 'planned',
+        metadata: { place: trip.destinations?.find((d) => d.name === 'Paris') },
+      },
+    });
+    expect(plannedResponse.ok()).toBeTruthy();
+
+    const draftResponse = await request.post(activitiesUrl, {
+      headers: { Authorization: token },
+      data: {
+        trip: tripId,
+        name: draftActivityName,
+        status: 'draft',
+      },
+    });
+    expect(draftResponse.ok()).toBeTruthy();
   });
 
   test.beforeEach(async ({ page }) => {
@@ -46,7 +90,12 @@ test.describe('Activities Filter', () => {
     await viewTripPage.switchToTab('Activities');
   });
 
-  test("should open and close the activity filters", async ({ page }) => {
+  test.afterEach(async ({}) => {
+    viewTripPage.openActivityFilters();
+    viewTripPage.resetActivityFilters();
+  });
+
+  test('should open and close the activity filters', async ({ page }) => {
     // Open the filter form
     await viewTripPage.openActivityFilters();
     const filters = page.getByRole('dialog', { name: 'Filters' });
@@ -57,29 +106,35 @@ test.describe('Activities Filter', () => {
     await expect(filters).toBeHidden();
   });
 
-  test.fixme("should filter activities by status", async ({ }) => {
+  test('should filter activities by status', async ({ page }) => {
+    // Open the filter form
+    await viewTripPage.openActivityFilters();
+    // Select "Draft"
+    await viewTripPage.setStatusFilter('Draft');
+    // Apply the filters
+    await viewTripPage.applyActivityFilters();
 
-    const plannedActivityName = 'Visit the Louvre';
-    const startDate = getStartDate(trip.startDate);
-    const endDate = getEndDate(startDate, 1);
-    await viewTripPage.addActivity({
-      name: plannedActivityName,
-      startDate,
-      endDate,
-      destinationName: 'Paris',
-      address: 'Louvre Museum, Paris, France',
-      description: 'See the Mona Lisa and other famous artworks',
-    });
+    await expect(page.getByRole('button', { name: 'Filters ' })).toContainText('1');
+    await expect(viewTripPage.getActivityCard(plannedActivityName)).not.toBeVisible();
+    await expect(viewTripPage.getActivityCard(draftActivityName)).toBeVisible();
 
-    const draftActivityName = 'Cooking class';
-    await viewTripPage.addDraftActivity({ name: draftActivityName });
+    await viewTripPage.openActivityFilters();
+    await viewTripPage.resetActivityFilters();
+
+    await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+    await expect(viewTripPage.getActivityCard(draftActivityName)).toBeVisible();
 
     // Open the filter form
     await viewTripPage.openActivityFilters();
     // Select "Draft"
-    await viewTripPage.setStatusFilter("draft");
+    await viewTripPage.setStatusFilter('Planned');
     // Apply the filters
     await viewTripPage.applyActivityFilters();
 
+    await expect(page.getByRole('button', { name: 'Filters ' })).toContainText('1');
+    await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+    await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
   });
+
+
 });

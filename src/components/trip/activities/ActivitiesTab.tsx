@@ -1,6 +1,6 @@
 import type { Trip, Attachment, Expense, TravellerProfile, Activity } from '../../../types/trips.ts';
 import { useQuery } from '@tanstack/react-query';
-import { Fragment } from 'react';
+import { Fragment, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { listActivities } from '../../../lib/api';
 import { Card, Container, Flex, Group, LoadingOverlay, Modal, Stack, Text } from '@mantine/core';
@@ -9,7 +9,8 @@ import { useDisclosure } from '@mantine/hooks';
 import { GenericActivityForm } from './GenericActivityForm.tsx';
 import { AddActivitiesMenu } from './AddActivitiesMenu.tsx';
 import { GenericActivityData } from './GenericActivityData.tsx';
-import { ActivitiesFilter} from './ActivitiesFilter.tsx';
+import { ActivitiesFilter } from './ActivitiesFilter.tsx';
+import { ActivityFilters, filterActivities } from './filters.ts';
 
 type ActivitiesViewProps = {
   trip: Trip;
@@ -35,9 +36,14 @@ export const ActivitiesTab = ({
 
   const { isMobile } = useSurmaiContext();
   const [formOpened, { open: openForm, close: closeForm }] = useDisclosure(false);
+  const [filters, setFilters] = useState<Partial<ActivityFilters>>({});
+
+  const filteredList = useMemo(() => {
+    return filterActivities(data || [], filters);
+  }, [data, filters]);
 
   const refetchData = () => {
-    return refetch().then(() => refetchTrip());
+    return void refetch().then(() => refetchTrip());
   };
 
   if (isPending) {
@@ -47,6 +53,14 @@ export const ActivitiesTab = ({
   if (isError) {
     throw new Error(error.message);
   }
+
+  const handleApplyFilters = (filters: ActivityFilters) => {
+    setFilters(filters);
+  };
+
+  const handleResetFilters = () => {
+    setFilters({});
+  };
 
   return (
     <Container py={'xs'} size="xl">
@@ -88,14 +102,19 @@ export const ActivitiesTab = ({
           </>
         )}
       </Group>
-      <ActivitiesFilter />
+      <ActivitiesFilter onApplyFilters={handleApplyFilters} onResetFilters={handleResetFilters} />
       <Stack mt={'sm'}>
         {data.length === 0 && (
           <Card withBorder>
             <Text c={'dimmed'}>{t('activity_no_data', 'No Activities')}</Text>
           </Card>
         )}
-        {data.map((t: Activity) => {
+        {data.length > 0 && filteredList.length === 0 && (
+          <Card withBorder>
+            <Text c={'dimmed'}>{t('filter_activity_no_data', 'No Activities match')}</Text>
+          </Card>
+        )}
+        {filteredList.map((t: Activity) => {
           return (
             <Fragment key={t.id}>
               <GenericActivityData

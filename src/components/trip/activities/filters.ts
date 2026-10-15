@@ -1,6 +1,6 @@
-import { Activity, ActivityStatus } from '../../../types/trips.ts';
+import type { Activity, ActivityStatus } from '../../../types/trips.ts';
 
-type ActivityFilters = {
+export type ActivityFilters = {
   status: ActivityStatus | "all";
 }
 

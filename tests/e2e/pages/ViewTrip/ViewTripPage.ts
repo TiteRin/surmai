@@ -3,7 +3,6 @@ import { expect } from '@playwright/test';
 import { getSelectorString } from './helper.ts';
 
 import type { Page } from '@playwright/test';
-import { ActivityStatus } from '../../../../src/types/trips.ts';
 
 export class ViewTripPage {
   private page: Page;
@@ -98,8 +97,8 @@ export class ViewTripPage {
 
     await this.selectDatePickerValue('drop-off-time', carRentalData.dropOffTime);
 
-    await this.page.getByRole('textbox', { name: 'Destination' }).click()
-    await this.page.getByRole('option').first().click()
+    await this.page.getByRole('textbox', { name: 'Destination' }).click();
+    await this.page.getByRole('option').first().click();
 
     await this.page.getByRole('button', { name: 'Save' }).click();
     await this.page.waitForTimeout(1000);
@@ -301,8 +300,12 @@ export class ViewTripPage {
     await this.page.getByRole('button', { name: 'Apply' }).click();
   }
 
-  async setStatusFilter(status: ActivityStatus) {
+  async resetActivityFilters() {
+    await this.page.getByRole('button', { name: 'Reset' }).click();
+  }
 
+  async setStatusFilter(status: string) {
+    await this.page.getByRole('radio', { name: status }).check();
   }
 
   /**
