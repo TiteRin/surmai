@@ -1,9 +1,10 @@
-import { Badge, Button, Radio, Group, Input, Paper, Popover, Stack, Chip } from '@mantine/core';
+import { Badge, Button, Group, Input, Paper, Popover, Stack, Chip } from '@mantine/core';
 import { IconFilter, IconWorldSearch } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useForm } from '@mantine/form';
 import { ActivityFilterNames, ActivityFilters, countActiveFilters, defaultActivityFilters } from './filters.ts';
+import { StatusFilter } from './filters/StatusFilter.tsx';
 
 const CountFiltersBadge = ({ count }: { count: number }) => {
   if (count === 0) {
@@ -22,7 +23,7 @@ export const ActivitiesFilter = ({ onApplyFilters, onResetFilters }: ActivitiesF
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [currentFilters, setCurrentFilters] = useState<ActivityFilters>({
     ...defaultActivityFilters,
-    status: 'all'
+    status: 'all',
   });
 
   const form = useForm<ActivityFilters>({
@@ -74,18 +75,7 @@ export const ActivitiesFilter = ({ onApplyFilters, onResetFilters }: ActivitiesF
             </Popover.Target>
             <Popover.Dropdown>
               <form>
-                <Radio.Group
-                  name={'status'}
-                  label={t('filters_activities_status', 'Status')}
-                  key={form.key('status')}
-                  {...form.getInputProps('status')}
-                >
-                  <Stack gap={'xs'} mt={'sm'}>
-                    <Radio value={'all'} label={t('all', 'All')} />
-                    <Radio value={'draft'} label={t('draft', 'Draft')} />
-                    <Radio value={'planned'} label={t('planned', 'Planned')} />
-                  </Stack>
-                </Radio.Group>
+                <StatusFilter key={form.key('status')} inputProps={form.getInputProps('status')} />
                 <Group gap={'sm'} justify={'flex-end'} mt={'sm'}>
                   <Button variant={'subtle'} onClick={handleResetFilters}>
                     {t('reset', 'Reset')}
@@ -97,7 +87,7 @@ export const ActivitiesFilter = ({ onApplyFilters, onResetFilters }: ActivitiesF
           </Popover>
         </Group>
         {countFilters > 0 && (
-          <Group gap={'sm'} className={"filter_pills"}>
+          <Group gap={'sm'} className={'filter_pills'}>
             {Object.entries(currentFilters).map(([filterName, filterValues]) => {
               return (
                 <Chip defaultChecked size={'md'} onChange={() => handleClearFilter(filterName as ActivityFilterNames)}>
