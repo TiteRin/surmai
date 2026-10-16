@@ -4,7 +4,9 @@ export type ActivityFilters = {
   status: ActivityStatus | "all";
 }
 
-const defaultActivityFilters: ActivityFilters = {
+export type ActivityFilterNames = keyof ActivityFilters;
+
+export const defaultActivityFilters: ActivityFilters = {
   status: "all"
 }
 
@@ -36,7 +38,19 @@ export const countActiveFilters = (
   const filters = getFilters(partialActivityFilters);
 
   return Object.keys(filters)
-    .reduce((carry: number, filterName: string) => {
-      return carry + (filters[filterName] !== defaultActivityFilters[filterName]);
+    .reduce((carry, filterName) => {
+
+      const defaultFilterValue = defaultActivityFilters[filterName as ActivityFilterNames];
+      const filterValue = filters[filterName as ActivityFilterNames];
+
+      if (typeof defaultFilterValue !== typeof filterValue) {
+        return carry + 1;
+      }
+
+      if (typeof defaultFilterValue === "string") {
+        return carry + Number(filterValue !== defaultFilterValue);
+      }
+
+      return carry;
     }, 0);
 }

@@ -136,5 +136,21 @@ test.describe('Activities Filter', () => {
     await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
   });
 
+  test("should show a pill when the filter status:draft is selected", async ({ page }) => {
+    // Open the filter form
+    await viewTripPage.openActivityFilters();
+    // Select "Draft"
+    await viewTripPage.setStatusFilter('Draft');
+    // Apply the filters
+    await viewTripPage.applyActivityFilters();
 
+    const filterPills = page.locator('.filter_pills');
+    const pill = filterPills.getByText('Draft');
+
+    await expect(pill).toBeVisible();
+    pill.click();
+    await expect(pill).not.toBeVisible();
+
+    await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+  });
 });
