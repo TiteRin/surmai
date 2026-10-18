@@ -153,4 +153,24 @@ test.describe('Activities Filter', () => {
 
     await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
   });
+
+  test("should filter the activities by destination", async ({ page }) => {
+    // Open the filter form
+    await viewTripPage.openActivityFilters();
+    // Select "Draft"
+
+    const destinationBox = page.getByRole('combobox', { name: 'Destination' });
+
+    await expect(destinationBox).toBeVisible();
+    await expect(destinationBox).toHaveValue('');
+
+    await destinationBox.selectOption('Paris, France');
+
+    await expect(destinationBox).toHaveValue('Paris, France');
+
+    await viewTripPage.applyActivityFilters();
+
+    await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+    await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+  });
 });
