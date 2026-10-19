@@ -1,26 +1,21 @@
 import type { Activity, ActivityStatus } from '../../../types/trips.ts';
 
 export type ActivityFilters = {
-  status: ActivityStatus | "all";
+  status: ActivityStatus | 'all';
   destinations?: string[];
-}
+};
 
 export type ActivityFilterNames = keyof ActivityFilters;
 
 export const defaultActivityFilters: ActivityFilters = {
-  status: "all",
-  destinations: []
-}
-
-const getFilters = (filters: Partial<ActivityFilters>): ActivityFilters => ({
-  ...defaultActivityFilters,
-  ...filters
-});
+  status: 'all',
+  destinations: [],
+};
 
 const mapFilters: Record<ActivityFilterNames, (value: any) => (activity: Activity) => boolean> = {
-  "status": (value: ActivityStatus) => ((activity: Activity) => activity.status === value),
-  "destinations": (values: string[]) => ((activity: Activity) => values.includes(activity.metadata?.place?.id))
-}
+  status: (value: ActivityStatus) => (activity: Activity) => activity.status === value,
+  destinations: (values: string[]) => (activity: Activity) => values.includes(activity.metadata?.place?.id),
+};
 
 export const filterActivities = (
   activityList: Activity[],
@@ -31,54 +26,70 @@ export const filterActivities = (
     return [...activityList];
   }
 
+  const activeFilters = getActiveFilters(partialActivityFilters);
+
   let filteredActivityList = [...activityList];
 
-  Object.entries(partialActivityFilters).forEach(
-    ([filterName, filterValue]) => {
-      if (defaultActivityFilters[filterName as ActivityFilterNames] === filterValue) {
-        return;
-      }
+  Object.entries(activeFilters).forEach(([filterName, filterValue]) => {
+    if (defaultActivityFilters[filterName as ActivityFilterNames] === filterValue) {
+      return;
+    }
 
-      filteredActivityList = filteredActivityList.filter(
-        mapFilters[filterName as ActivityFilterNames](filterValue)
-      );
+    filteredActivityList = filteredActivityList.filter(mapFilters[filterName as ActivityFilterNames](filterValue));
   });
 
   return [...filteredActivityList];
-}
+};
 
-export const countActiveFilters = (
-  partialActivityFilters: Partial<ActivityFilters> = {}
-): number => {
+export const getActiveFilters = (activityFilters: Partial<ActivityFilters>): Partial<ActivityFilters> => {
+  return Object.keys(activityFilters).reduce((carry: Partial<ActivityFilters>, filterName: string) => {
+    const defaultFilterValue = defaultActivityFilters[filterName as ActivityFilterNames];
+    const filterValue = activityFilters[filterName as ActivityFilterNames];
 
-  const filters = getFilters(partialActivityFilters);
+    if (typeof defaultFilterValue !== typeof filterValue) {
+      return {
+        ...carry,
+        [filterName]: filterValue,
+      };
+    }
 
-  return Object.keys(filters)
-    .reduce((carry, filterName) => {
+    if ((typeof defaultFilterValue === 'string') && (typeof filterValue === 'string')) {
+      if (filterValue !== defaultFilterValue) {
+        return {
+          ...carry,
+          [filterName]: filterValue,
+        };
+      }
+    }
 
-      const defaultFilterValue = defaultActivityFilters[filterName as ActivityFilterNames];
-      const filterValue = filters[filterName as ActivityFilterNames];
-
-      if (typeof defaultFilterValue !== typeof filterValue) {
-        return carry + 1;
+    if (Array.isArray(defaultFilterValue) && Array.isArray(filterValue)) {
+      if (defaultFilterValue.length !== filterValue.length) {
+        return {
+          ...carry,
+          [filterName]: filterValue,
+        };
       }
 
-      if (typeof defaultFilterValue === "string") {
-        return carry + Number(filterValue !== defaultFilterValue);
+      const sortedDefaultFilterValue = [...defaultFilterValue].sort();
+      const sortedFilterValue = [...filterValue].sort();
+
+      if (sortedFilterValue.join(',') !== sortedDefaultFilterValue.join(',')) {
+        return {
+          ...carry,
+          [filterName]: filterValue,
+        };
       }
+    }
 
-      if (Array.isArray(defaultFilterValue) && Array.isArray(filterValue)) {
+    return {
+      ...carry,
+    };
+  }, {});
+};
 
-        if (defaultFilterValue.length !== filterValue.length) {
-          return carry + 1;
-        }
+export const countActiveFilters = (partialActivityFilters: Partial<ActivityFilters> = {}): number => {
 
-        const sortedDefaultFilterValue = [...defaultFilterValue].sort();
-        const sortedFilterValue = [...filterValue].sort();
+  console.log(partialActivityFilters);
 
-        return carry + Number(sortedDefaultFilterValue.join(",") !== sortedFilterValue.join(","));
-      }
-
-      return carry;
-    }, 0);
-}
+  return Object.keys(getActiveFilters(partialActivityFilters)).length;
+};

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { countActiveFilters, filterActivities } from '../../../../../src/components/trip/activities/filters.ts';
+import {
+  countActiveFilters,
+  getActiveFilters,
+  defaultActivityFilters,
+  filterActivities,
+} from '../../../../../src/components/trip/activities/filters.ts';
 import { plannedActivity, draftActivity, parisActivity, londonActivity } from '../../../fixtures.tsx';
 import { Activity } from '../../../../../src/types/trips.ts';
 
@@ -83,5 +88,19 @@ describe('countActiveFilters', () => {
         destinations: ['Paris, France'],
       })
     ).toBe(2);
+  });
+});
+
+describe("getActiveFilters", () => {
+  it("when given the defaultFilters, should return an empty object", () => {
+    expect(getActiveFilters(defaultActivityFilters)).toEqual({});
+  });
+
+  it("when given an empty object, should return an empty object", () => {
+    expect(getActiveFilters({})).toEqual({});
+  });
+
+  it("when given a partial activeFilters, should return the partial object", () => {
+    expect(getActiveFilters({status: "draft"})).toEqual({status: "draft"});
   });
 });

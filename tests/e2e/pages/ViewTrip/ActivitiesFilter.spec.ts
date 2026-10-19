@@ -157,20 +157,52 @@ test.describe('Activities Filter', () => {
   test("should filter the activities by destination", async ({ page }) => {
     // Open the filter form
     await viewTripPage.openActivityFilters();
-    // Select "Draft"
-
     const destinationBox = page.getByRole('combobox', { name: 'Destination' });
 
     await expect(destinationBox).toBeVisible();
     await expect(destinationBox).toHaveValue('');
 
-    await destinationBox.selectOption('Paris, France');
-
-    await expect(destinationBox).toHaveValue('Paris, France');
+    await destinationBox.click();
+    await expect(page.getByRole('option', { name: 'Paris , France'})).toBeVisible();
+    await page.getByRole('option', { name: 'Paris , France'}).click();
 
     await viewTripPage.applyActivityFilters();
 
     await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
     await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+
+    const filterPills = page.locator('.filter_pills');
+    const pill = filterPills.getByText('Paris');
+
+    await expect(pill).toBeVisible();
+    pill.click();
+    await expect(pill).not.toBeVisible();
+  });
+
+  test('when clearing one pill filter, should keep the filter on the other one', async ({ page }) => {
+    // Open the filter form
+    await viewTripPage.openActivityFilters();
+    const destinationBox = page.getByRole('combobox', { name: 'Destination' });
+
+    await expect(destinationBox).toBeVisible();
+    await expect(destinationBox).toHaveValue('');
+
+    await destinationBox.click();
+    await expect(page.getByRole('option', { name: 'Paris , France' })).toBeVisible();
+    await page.getByRole('option', { name: 'Paris , France' }).click();
+
+    await destinationBox.click();
+    await expect(page.getByRole('option', { name: 'Rome , Italy' })).toBeVisible();
+    await page.getByRole('option', { name: 'Rome , Italy' }).click();
+
+    await viewTripPage.applyActivityFilters();
+
+    const filterPills = page.locator('.filter_pills');
+    await expect(filterPills.getByText('Paris')).toBeVisible();
+    await expect(filterPills.getByText('Rome')).toBeVisible();
+
+    await filterPills.getByText('Paris').click();
+    await expect(filterPills.getByText('Paris')).not.toBeVisible();
+    await expect(filterPills.getByText('Rome')).toBeVisible();
   });
 });

@@ -102,7 +102,7 @@ export const ActivitiesTab = ({
           </>
         )}
       </Group>
-      <ActivitiesFilter onApplyFilters={handleApplyFilters} onResetFilters={handleResetFilters} />
+      <ActivitiesFilter destinations={trip.destinations || []} onApplyFilters={handleApplyFilters} onResetFilters={handleResetFilters} />
       <Stack mt={'sm'}>
         {data.length === 0 && (
           <Card withBorder>
