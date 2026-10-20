@@ -28,6 +28,8 @@
   "activity_start_date": "Start Date",
   "activity_start_date_desc": "Activity start date and time",
   "activity_stats": "Activity Stats",
+  "activity_travellers": "Travellers",
+  "activity_travellers_desc": "Associated travellers",
   "add_basic_info_to_start": "Enter some basic information about your trip to get started",
   "add_column_after": "Add Column",
   "add_expense": "Add Expense",

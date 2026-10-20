@@ -12,6 +12,7 @@ type SearchableFilterProps = Omit<MultiSelectProps, 'data'> & {
   label: string;
   description: string;
   options: Array<Option>;
+  noneOption?: Option;
 };
 
 export const SearchableFilter = ({
@@ -19,10 +20,33 @@ export const SearchableFilter = ({
   description,
   options,
   disabled = false,
+  noneOption = undefined,
   ...props
 }: SearchableFilterProps) => {
-  const optionMap = new Map(options.map((option) => [option.value, option]));
+
+  const data = [
+    ...options,
+    ...(noneOption ? [noneOption] : []),
+  ];
+  const optionMap = new Map(data.map((option) => [option.value, option]));
   const [isSelectOpen, setIsSelectOpen] = useState<boolean>(false);
+
+  const handleChange = (values: string[]) => {
+
+    if (!noneOption) {
+      props.onChange(values);
+      return;
+    }
+
+    if (values.includes(noneOption.value)) {
+      props.onChange([noneOption.value]);
+      return;
+    }
+
+    props.onChange(values);
+  }
+
+  const isNoneOptionSelected = noneOption && props.value?.includes(noneOption.value);
 
   return (
     <MultiSelect
@@ -36,7 +60,8 @@ export const SearchableFilter = ({
       onDropdownClose={() => setIsSelectOpen(false)}
       onDropdownOpen={() => setIsSelectOpen(true)}
       onOptionSubmit={() => setIsSelectOpen(false)}
-      data={options}
+      onChange={handleChange}
+      data={data.map(option => ({...option, disabled: isNoneOptionSelected}))}
       searchable
       clearable
       disabled={disabled}

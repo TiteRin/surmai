@@ -1,8 +1,9 @@
-import type { Activity, ActivityStatus } from '../../../types/trips.ts';
+import type { Activity, ActivityStatus, TravellerProfile } from '../../../types/trips.ts';
 
 export type ActivityFilters = {
   status: ActivityStatus | 'all';
-  destinations?: string[];
+  destinations: string[];
+  travellers: string[];
 };
 
 export type ActivityFilterNames = keyof ActivityFilters;
@@ -10,11 +11,19 @@ export type ActivityFilterNames = keyof ActivityFilters;
 export const defaultActivityFilters: ActivityFilters = {
   status: 'all',
   destinations: [],
+  travellers: [],
 };
 
 const mapFilters: Record<ActivityFilterNames, (value: any) => (activity: Activity) => boolean> = {
   status: (value: ActivityStatus) => (activity: Activity) => activity.status === value,
   destinations: (values: string[]) => (activity: Activity) => values.includes(activity.metadata?.place?.id),
+  travellers: (values: string[]) => (activity: Activity) => (activity.travellers?.length === 0 || !!activity.travellers?.some(traveller => values.includes(traveller)))
+};
+
+export const NO_TRAVELER: TravellerProfile = {
+  id: 'NO_TRAVELER_ID',
+  email: '',
+  legalName: 'No travelers'
 };
 
 export const filterActivities = (
@@ -88,8 +97,5 @@ export const getActiveFilters = (activityFilters: Partial<ActivityFilters>): Par
 };
 
 export const countActiveFilters = (partialActivityFilters: Partial<ActivityFilters> = {}): number => {
-
-  console.log(partialActivityFilters);
-
   return Object.keys(getActiveFilters(partialActivityFilters)).length;
 };

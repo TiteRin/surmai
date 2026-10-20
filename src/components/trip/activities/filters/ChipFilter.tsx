@@ -26,5 +26,8 @@ export const StatusChipFilter = ({ valueToDisplay, onClearFilter }: ChipFilterPr
 };
 
 export const DestinationChipFilter = ({ valueToDisplay, onClearFilter }: ChipFilterProps) => {
-  return <DefaultChipFilter valueToDisplay={valueToDisplay} onClearFilter={onClearFilter} />;
+  return <DefaultChipFilter valueToDisplay={valueToDisplay} onClearFilter={onClearFilter} key={`destination-${valueToDisplay}`} />;
+};
+export const TravellerChipFilter = ({ valueToDisplay, onClearFilter }: ChipFilterProps) => {
+  return <DefaultChipFilter valueToDisplay={valueToDisplay} onClearFilter={onClearFilter} key={`traveller-${valueToDisplay}`} />;
 };
