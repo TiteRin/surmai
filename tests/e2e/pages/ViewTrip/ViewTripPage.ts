@@ -308,6 +308,23 @@ export class ViewTripPage {
     await this.page.getByRole('radio', { name: status }).check();
   }
 
+  async getTravelerSelect() {
+    return this.page.getByRole('combobox', { name: 'Travelers'});
+  }
+
+  async selectTraveler(travelerName: string) {
+
+    const option = this.page.getByRole('option', { name: travelerName });
+    const visible = await option.isVisible();
+
+    if (!visible) {
+      await this.getTravelerSelect().click();
+      await option.isVisible();
+    }
+
+    await option.click();
+  }
+
   /**
    * Add a note to the trip
    */

@@ -30,7 +30,6 @@ test.describe('Activities Filter', () => {
         startDate: dayjs().startOf('month').format('YYYY-MM-DDTHH:mm:ssZ'),
         endDate: dayjs().endOf('month').format('YYYY-MM-DDTHH:mm:ssZ'),
         ownerId: record.id,
-        participants: [{ name: 'Test User' }],
         destinations: [
           {
             id: 'paris',
@@ -55,6 +54,7 @@ test.describe('Activities Filter', () => {
     trip = (await tripResponse.json()) as Trip;
     tripId = trip.id;
 
+
     const activitiesUrl = `${backendUrl}/api/collections/activities/records`;
     const startDate = getStartDate(trip.startDate);
     const endDate = getEndDate(startDate, 1);
@@ -68,6 +68,7 @@ test.describe('Activities Filter', () => {
         startDate: dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
         endDate: dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
         status: 'planned',
+        //travellers: ['Bob', 'Charlie'].map((travelerName) => trip.participants),
         metadata: { place: trip.destinations?.find((d) => d.name === 'Paris') },
       },
     });
@@ -106,103 +107,150 @@ test.describe('Activities Filter', () => {
     await expect(filters).toBeHidden();
   });
 
-  test('should filter activities by status', async ({ page }) => {
-    // Open the filter form
-    await viewTripPage.openActivityFilters();
-    // Select "Draft"
-    await viewTripPage.setStatusFilter('Draft');
-    // Apply the filters
-    await viewTripPage.applyActivityFilters();
+  test.describe("Filters by status", () => {
 
-    await expect(page.getByRole('button', { name: 'Filters ' })).toContainText('1');
-    await expect(viewTripPage.getActivityCard(plannedActivityName)).not.toBeVisible();
-    await expect(viewTripPage.getActivityCard(draftActivityName)).toBeVisible();
+    test('should filter activities by status', async ({ page }) => {
+      // Open the filter form
+      await viewTripPage.openActivityFilters();
+      // Select "Draft"
+      await viewTripPage.setStatusFilter('Draft');
+      // Apply the filters
+      await viewTripPage.applyActivityFilters();
 
-    await viewTripPage.openActivityFilters();
-    await viewTripPage.resetActivityFilters();
+      await expect(page.getByRole('button', { name: 'Filters ' })).toContainText('1');
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).not.toBeVisible();
+      await expect(viewTripPage.getActivityCard(draftActivityName)).toBeVisible();
 
-    await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
-    await expect(viewTripPage.getActivityCard(draftActivityName)).toBeVisible();
+      await viewTripPage.openActivityFilters();
+      await viewTripPage.resetActivityFilters();
 
-    // Open the filter form
-    await viewTripPage.openActivityFilters();
-    // Select "Draft"
-    await viewTripPage.setStatusFilter('Planned');
-    // Apply the filters
-    await viewTripPage.applyActivityFilters();
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(draftActivityName)).toBeVisible();
 
-    await expect(page.getByRole('button', { name: 'Filters ' })).toContainText('1');
-    await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
-    await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+      // Open the filter form
+      await viewTripPage.openActivityFilters();
+      // Select "Draft"
+      await viewTripPage.setStatusFilter('Planned');
+      // Apply the filters
+      await viewTripPage.applyActivityFilters();
+
+      await expect(page.getByRole('button', { name: 'Filters ' })).toContainText('1');
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+    });
+
+    test("should show a pill when the filter status:draft is selected", async ({ page }) => {
+      // Open the filter form
+      await viewTripPage.openActivityFilters();
+      // Select "Draft"
+      await viewTripPage.setStatusFilter('Draft');
+      // Apply the filters
+      await viewTripPage.applyActivityFilters();
+
+      const filterPills = page.locator('.filter_pills');
+      const pill = filterPills.getByText('Draft');
+
+      await expect(pill).toBeVisible();
+      pill.click();
+      await expect(pill).not.toBeVisible();
+
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+    });
   });
 
-  test("should show a pill when the filter status:draft is selected", async ({ page }) => {
-    // Open the filter form
-    await viewTripPage.openActivityFilters();
-    // Select "Draft"
-    await viewTripPage.setStatusFilter('Draft');
-    // Apply the filters
-    await viewTripPage.applyActivityFilters();
 
-    const filterPills = page.locator('.filter_pills');
-    const pill = filterPills.getByText('Draft');
+  test.describe("Filters by destination", () => {
+    test("should filter the activities by destination", async ({ page }) => {
+      // Open the filter form
+      await viewTripPage.openActivityFilters();
+      const destinationBox = page.getByRole('combobox', { name: 'Destination' });
 
-    await expect(pill).toBeVisible();
-    pill.click();
-    await expect(pill).not.toBeVisible();
+      await expect(destinationBox).toBeVisible();
+      await expect(destinationBox).toHaveValue('');
 
-    await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+      await destinationBox.click();
+      await expect(page.getByRole('option', { name: 'Paris , France'})).toBeVisible();
+      await page.getByRole('option', { name: 'Paris , France'}).click();
+
+      await viewTripPage.applyActivityFilters();
+
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+
+      const filterPills = page.locator('.filter_pills');
+      const pill = filterPills.getByText('Paris');
+
+      await expect(pill).toBeVisible();
+      pill.click();
+      await expect(pill).not.toBeVisible();
+    });
+
+    test('when clearing one pill filter, should keep the filter on the other one', async ({ page }) => {
+      // Open the filter form
+      await viewTripPage.openActivityFilters();
+      const destinationBox = page.getByRole('combobox', { name: 'Destination' });
+
+      await expect(destinationBox).toBeVisible();
+      await expect(destinationBox).toHaveValue('');
+
+      await destinationBox.click();
+      await expect(page.getByRole('option', { name: 'Paris , France' })).toBeVisible();
+      await page.getByRole('option', { name: 'Paris , France' }).click();
+
+      await destinationBox.click();
+      await expect(page.getByRole('option', { name: 'Rome , Italy' })).toBeVisible();
+      await page.getByRole('option', { name: 'Rome , Italy' }).click();
+
+      await viewTripPage.applyActivityFilters();
+
+      const filterPills = page.locator('.filter_pills');
+      await expect(filterPills.getByText('Paris')).toBeVisible();
+      await expect(filterPills.getByText('Rome')).toBeVisible();
+
+      await filterPills.getByText('Paris').click();
+      await expect(filterPills.getByText('Paris')).not.toBeVisible();
+      await expect(filterPills.getByText('Rome')).toBeVisible();
+    });
   });
 
-  test("should filter the activities by destination", async ({ page }) => {
-    // Open the filter form
-    await viewTripPage.openActivityFilters();
-    const destinationBox = page.getByRole('combobox', { name: 'Destination' });
+  test.describe("Filters by travelers", () => {
+    test("should filter the activities by travelers", async ({ page }) => {
+      // Open the filter form
+      await viewTripPage.openActivityFilters();
 
-    await expect(destinationBox).toBeVisible();
-    await expect(destinationBox).toHaveValue('');
+      const travelerSelect = viewTripPage.getTravelerSelect();
 
-    await destinationBox.click();
-    await expect(page.getByRole('option', { name: 'Paris , France'})).toBeVisible();
-    await page.getByRole('option', { name: 'Paris , France'}).click();
+      await expect(travelerSelect).toBeVisible();
+      await travelerSelect.click();
 
-    await viewTripPage.applyActivityFilters();
+      await expect(page.getByRole('option', { name: 'Alice'})).toBeVisible();
+      await expect(page.getByRole('option', { name: 'Bob'})).toBeVisible();
+      await expect(page.getByRole('option', { name: 'Charlie'})).toBeVisible();
 
-    await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
-    await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+      await viewTripPage.selectTraveler('');
+      await viewTripPage.applyActivityFilters();
 
-    const filterPills = page.locator('.filter_pills');
-    const pill = filterPills.getByText('Paris');
 
-    await expect(pill).toBeVisible();
-    pill.click();
-    await expect(pill).not.toBeVisible();
-  });
+      /*
+      const destinationBox = page.getByRole('combobox', { name: 'Travelers' });
 
-  test('when clearing one pill filter, should keep the filter on the other one', async ({ page }) => {
-    // Open the filter form
-    await viewTripPage.openActivityFilters();
-    const destinationBox = page.getByRole('combobox', { name: 'Destination' });
 
-    await expect(destinationBox).toBeVisible();
-    await expect(destinationBox).toHaveValue('');
+      await destinationBox.click();
+      await expect(page.getByRole('option', { name: 'Paris , France'})).toBeVisible();
+      await page.getByRole('option', { name: 'Paris , France'}).click();
 
-    await destinationBox.click();
-    await expect(page.getByRole('option', { name: 'Paris , France' })).toBeVisible();
-    await page.getByRole('option', { name: 'Paris , France' }).click();
+      await viewTripPage.applyActivityFilters();
 
-    await destinationBox.click();
-    await expect(page.getByRole('option', { name: 'Rome , Italy' })).toBeVisible();
-    await page.getByRole('option', { name: 'Rome , Italy' }).click();
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
 
-    await viewTripPage.applyActivityFilters();
+      const filterPills = page.locator('.filter_pills');
+      const pill = filterPills.getByText('Paris');
 
-    const filterPills = page.locator('.filter_pills');
-    await expect(filterPills.getByText('Paris')).toBeVisible();
-    await expect(filterPills.getByText('Rome')).toBeVisible();
-
-    await filterPills.getByText('Paris').click();
-    await expect(filterPills.getByText('Paris')).not.toBeVisible();
-    await expect(filterPills.getByText('Rome')).toBeVisible();
+      await expect(pill).toBeVisible();
+      pill.click();
+      await expect(pill).not.toBeVisible();
+       */
+    });
   });
 });

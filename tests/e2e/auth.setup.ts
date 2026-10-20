@@ -13,6 +13,9 @@ const travellerProfiles = [
   { legalName: 'John Doe', email: 'john.doe@test.surmai.app' },
   { legalName: 'Jane Smith', email: 'jane.smith@test.surmai.app' },
   { legalName: 'Test User', email: 'test.user@test.surmai.app' },
+  { legalName: 'Alice', email: 'alice@test.surmai.app' },
+  { legalName: 'Bob', email: 'bob@test.surmai.app' },
+  { legalName: 'Charlie', email: 'charlie@test.surmai.app' },
 ];
 
 setup('seed traveller profiles', async ({ request }) => {
