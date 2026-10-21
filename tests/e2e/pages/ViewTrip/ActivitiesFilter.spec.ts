@@ -22,6 +22,16 @@ test.describe('Activities Filter', () => {
     expect(authResponse.ok()).toBeTruthy();
     const { token, record } = await authResponse.json();
 
+    // Traveller profiles are seeded in auth.setup.ts
+    const profilesResponse = await request.get(`${backendUrl}/api/collections/traveller_profiles/records`, {
+      headers: { Authorization: token },
+      params: { filter: "legalName='Alice' || legalName='Bob' || legalName='Charlie'" },
+    });
+    expect(profilesResponse.ok()).toBeTruthy();
+    const profiles: { id: string; legalName: string }[] = (await profilesResponse.json()).items;
+    const travellerIds = (...names: string[]) =>
+      names.map((name) => profiles.find((p) => p.legalName === name)!.id);
+
     const tripResponse = await request.post(`${backendUrl}/api/collections/trips/records`, {
       headers: { Authorization: token },
       data: {
@@ -30,6 +40,7 @@ test.describe('Activities Filter', () => {
         startDate: dayjs().startOf('month').format('YYYY-MM-DDTHH:mm:ssZ'),
         endDate: dayjs().endOf('month').format('YYYY-MM-DDTHH:mm:ssZ'),
         ownerId: record.id,
+        travellers: travellerIds('Alice', 'Bob', 'Charlie'),
         destinations: [
           {
             id: 'paris',
@@ -68,7 +79,7 @@ test.describe('Activities Filter', () => {
         startDate: dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
         endDate: dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
         status: 'planned',
-        //travellers: ['Bob', 'Charlie'].map((travelerName) => trip.participants),
+        travellers: travellerIds('Bob', 'Charlie'),
         metadata: { place: trip.destinations?.find((d) => d.name === 'Paris') },
       },
     });
@@ -80,6 +91,7 @@ test.describe('Activities Filter', () => {
         trip: tripId,
         name: draftActivityName,
         status: 'draft',
+        travellers: travellerIds('Alice'),
       },
     });
     expect(draftResponse.ok()).toBeTruthy();
@@ -227,30 +239,14 @@ test.describe('Activities Filter', () => {
       await expect(page.getByRole('option', { name: 'Bob'})).toBeVisible();
       await expect(page.getByRole('option', { name: 'Charlie'})).toBeVisible();
 
-      await viewTripPage.selectTraveler('');
-      await viewTripPage.applyActivityFilters();
-
-
-      /*
-      const destinationBox = page.getByRole('combobox', { name: 'Travelers' });
-
-
-      await destinationBox.click();
-      await expect(page.getByRole('option', { name: 'Paris , France'})).toBeVisible();
-      await page.getByRole('option', { name: 'Paris , France'}).click();
-
+      await viewTripPage.selectTraveler('Bob');
       await viewTripPage.applyActivityFilters();
 
       await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
       await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
 
       const filterPills = page.locator('.filter_pills');
-      const pill = filterPills.getByText('Paris');
-
-      await expect(pill).toBeVisible();
-      pill.click();
-      await expect(pill).not.toBeVisible();
-       */
+      await expect(filterPills.getByText('Bob')).toBeVisible();
     });
   });
 });

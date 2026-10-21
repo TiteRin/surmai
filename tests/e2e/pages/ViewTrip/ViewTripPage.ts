@@ -308,8 +308,8 @@ export class ViewTripPage {
     await this.page.getByRole('radio', { name: status }).check();
   }
 
-  async getTravelerSelect() {
-    return this.page.getByRole('combobox', { name: 'Travelers'});
+  getTravelerSelect() {
+    return this.page.getByRole('combobox', { name: 'Travellers'});
   }
 
   async selectTraveler(travelerName: string) {
