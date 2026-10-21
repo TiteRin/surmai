@@ -13,6 +13,7 @@ test.describe('Activities Filter', () => {
 
   const plannedActivityName = 'Visit the Louvre';
   const draftActivityName = 'Cooking class';
+  const noTravelerActivityName = 'Seine river cruise';
 
   // Seed the trip through the API, the UI creation flow is covered by CreateNewTrip specs
   test.beforeAll(async ({ request }) => {
@@ -95,6 +96,20 @@ test.describe('Activities Filter', () => {
       },
     });
     expect(draftResponse.ok()).toBeTruthy();
+
+    // No travellers means the activity applies to every traveller of the trip
+    const noTravelerResponse = await request.post(activitiesUrl, {
+      headers: { Authorization: token },
+      data: {
+        trip: tripId,
+        name: noTravelerActivityName,
+        status: 'planned',
+        address: 'Louvre Museum, Paris, France',
+        startDate: dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+        endDate: dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      },
+    });
+    expect(noTravelerResponse.ok()).toBeTruthy();
   });
 
   test.beforeEach(async ({ page }) => {
@@ -247,6 +262,29 @@ test.describe('Activities Filter', () => {
 
       const filterPills = page.locator('.filter_pills');
       await expect(filterPills.getByText('Bob')).toBeVisible();
+    });
+
+    test('an activity without travelers should stay visible whatever traveler is selected', async () => {
+      for (const traveler of ['Alice', 'Bob', 'Charlie']) {
+        await viewTripPage.openActivityFilters();
+        await viewTripPage.selectTraveler(traveler);
+        await viewTripPage.applyActivityFilters();
+
+        await expect(viewTripPage.getActivityCard(noTravelerActivityName)).toBeVisible();
+
+        await viewTripPage.openActivityFilters();
+        await viewTripPage.resetActivityFilters();
+      }
+    });
+
+    test('should only show activities without travelers when "No travelers" is selected', async () => {
+      await viewTripPage.openActivityFilters();
+      await viewTripPage.selectTraveler('No travelers');
+      await viewTripPage.applyActivityFilters();
+
+      await expect(viewTripPage.getActivityCard(noTravelerActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).not.toBeVisible();
+      await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
     });
   });
 });
