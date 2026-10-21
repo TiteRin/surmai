@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 import dayjs from 'dayjs';
 import { ViewTripPage } from './ViewTripPage.ts';
-import { getEndDate, getStartDate } from './helper.ts';
 import { Trip } from '../../../../src/types/trips.ts';
 
 const backendUrl = 'http://127.0.0.1:8060';
@@ -68,8 +67,8 @@ test.describe('Activities Filter', () => {
 
 
     const activitiesUrl = `${backendUrl}/api/collections/activities/records`;
-    const startDate = getStartDate(trip.startDate);
-    const endDate = getEndDate(startDate, 1);
+    // Fixed days of the trip month, the date filter tests rely on them
+    const tripDay = (day: number) => dayjs(trip.startDate).date(day).hour(10).format('YYYY-MM-DDTHH:mm:ss[Z]');
     const plannedResponse = await request.post(activitiesUrl, {
       headers: { Authorization: token },
       data: {
@@ -77,8 +76,8 @@ test.describe('Activities Filter', () => {
         name: plannedActivityName,
         description: 'See the Mona Lisa and other famous artworks',
         address: 'Louvre Museum, Paris, France',
-        startDate: dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
-        endDate: dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+        startDate: tripDay(3),
+        endDate: tripDay(4),
         status: 'planned',
         travellers: travellerIds('Bob', 'Charlie'),
         metadata: { place: trip.destinations?.find((d) => d.name === 'Paris') },
@@ -105,8 +104,8 @@ test.describe('Activities Filter', () => {
         name: noTravelerActivityName,
         status: 'planned',
         address: 'Louvre Museum, Paris, France',
-        startDate: dayjs(startDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
-        endDate: dayjs(endDate).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+        startDate: tripDay(20),
+        endDate: tripDay(20),
       },
     });
     expect(noTravelerResponse.ok()).toBeTruthy();
@@ -285,6 +284,74 @@ test.describe('Activities Filter', () => {
       await expect(viewTripPage.getActivityCard(noTravelerActivityName)).toBeVisible();
       await expect(viewTripPage.getActivityCard(plannedActivityName)).not.toBeVisible();
       await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+    });
+  });
+
+  // ponytail: written ahead of the date filter. Assumed UX: Mantine range picker (data-testid="activity-filter-dates"),
+  // an activity matches when its dates overlap the range, undated activities are hidden.
+  test.describe('Filters by dates', () => {
+    const tripDate = (day: number) => dayjs(trip.startDate).date(day).format('YYYY-MM-DD');
+
+    test('should only show activities within the selected dates', async () => {
+      await viewTripPage.openActivityFilters();
+      await viewTripPage.setDateRangeFilter(tripDate(1), tripDate(5));
+      await viewTripPage.applyActivityFilters();
+
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(noTravelerActivityName)).not.toBeVisible();
+    });
+
+    test('should show an activity overlapping the selected dates', async () => {
+      // Louvre runs from day 3 to day 4
+      await viewTripPage.openActivityFilters();
+      await viewTripPage.setDateRangeFilter(tripDate(4), tripDate(6));
+      await viewTripPage.applyActivityFilters();
+
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(noTravelerActivityName)).not.toBeVisible();
+    });
+
+    test('should include activities on the boundary days', async () => {
+      await viewTripPage.openActivityFilters();
+      await viewTripPage.setDateRangeFilter(tripDate(20), tripDate(20));
+      await viewTripPage.applyActivityFilters();
+
+      await expect(viewTripPage.getActivityCard(noTravelerActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).not.toBeVisible();
+    });
+
+    test('should hide activities without dates', async () => {
+      await viewTripPage.openActivityFilters();
+      await viewTripPage.setDateRangeFilter(tripDate(1), tripDate(28));
+      await viewTripPage.applyActivityFilters();
+
+      await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+    });
+
+    test('should show a pill for the dates filter and clear it on click', async ({ page }) => {
+      await viewTripPage.openActivityFilters();
+      await viewTripPage.setDateRangeFilter(tripDate(1), tripDate(5));
+      await viewTripPage.applyActivityFilters();
+
+      await expect(page.getByRole('button', { name: 'Filters ' })).toContainText('1');
+      const pill = page.locator('.filter_pills').getByRole('checkbox');
+      await expect(pill).toHaveCount(1);
+      await pill.click();
+
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(noTravelerActivityName)).toBeVisible();
+      await expect(viewTripPage.getActivityCard(draftActivityName)).toBeVisible();
+    });
+
+    test('should combine the dates filter with the status filter', async () => {
+      await viewTripPage.openActivityFilters();
+      await viewTripPage.setStatusFilter('Draft');
+      await viewTripPage.setDateRangeFilter(tripDate(1), tripDate(5));
+      await viewTripPage.applyActivityFilters();
+
+      await expect(viewTripPage.getActivityCard(plannedActivityName)).not.toBeVisible();
+      await expect(viewTripPage.getActivityCard(draftActivityName)).not.toBeVisible();
+      await expect(viewTripPage.getActivityCard(noTravelerActivityName)).not.toBeVisible();
     });
   });
 });

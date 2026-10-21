@@ -308,6 +308,12 @@ export class ViewTripPage {
     await this.page.getByRole('radio', { name: status }).check();
   }
 
+  async setDateRangeFilter(startDate: string, endDate: string) {
+    await this.page.click('[data-testid="activity-filter-dates"]');
+    await this.page.click(getSelectorString(startDate));
+    await this.page.click(getSelectorString(endDate));
+  }
+
   getTravelerSelect() {
     return this.page.getByRole('combobox', { name: 'Travellers'});
   }

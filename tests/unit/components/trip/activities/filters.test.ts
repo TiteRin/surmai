@@ -61,6 +61,43 @@ describe('filters', () => {
       expect(filterActivities(activities, { destinations: ['madrid'] })).toEqual([]);
     });
   });
+
+  describe('by dates', () => {
+    const noDateActivity = {
+      ...draftActivity
+    }
+    const inRangeActivity = {
+      ...plannedActivity,
+      startDate: '2026-06-10T09:30:00',
+      endDate: '2026-06-10T12:00:00',
+    };
+    const outOfRangeActivity = {
+      ...plannedActivity,
+      startDate: '2026-06-12T09:30:00',
+      endDate: '2026-06-12T12:00:00',
+    };
+
+    const dateFilter = { dates: ['2026-06-10', '2026-06-11']};
+
+    it('if the date range is not valid, throw an error', () => {
+      expect(() => filterActivities([], { dates: ['2026-06-10', '2026-06-09']})).toThrowError();
+    });
+
+    it('when no dates are defined, should return all activities', () => {
+      const activities = [inRangeActivity, outOfRangeActivity];
+      expect(filterActivities(activities, { dates: null })).toEqual(activities);
+    });
+
+    it('when a date range is selected, should return only activities whose dates overlap', () => {
+      const activities = [inRangeActivity, outOfRangeActivity];
+      expect(filterActivities(activities, dateFilter)).toEqual([inRangeActivity]);
+    });
+
+    it('when a date range is selected, draft without dates are not visible', () => {
+        const activities = [noDateActivity];
+        expect(filterActivities(activities, dateFilter)).toEqual([]);
+    });
+  });
 });
 
 describe('countActiveFilters', () => {

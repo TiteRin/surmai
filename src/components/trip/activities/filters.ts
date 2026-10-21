@@ -1,9 +1,15 @@
 import type { Activity, ActivityStatus, TravellerProfile } from '../../../types/trips.ts';
 
+type DatesFilter = [
+  string | null,
+  string | null
+];
+
 export type ActivityFilters = {
   status: ActivityStatus | 'all';
   destinations: string[];
   travellers: string[];
+  dates: DatesFilter | null
 };
 
 export type ActivityFilterNames = keyof ActivityFilters;
@@ -12,12 +18,14 @@ export const defaultActivityFilters: ActivityFilters = {
   status: 'all',
   destinations: [],
   travellers: [],
+  dates: null
 };
 
 const mapFilters: Record<ActivityFilterNames, (value: any) => (activity: Activity) => boolean> = {
   status: (value: ActivityStatus) => (activity: Activity) => activity.status === value,
   destinations: (values: string[]) => (activity: Activity) => values.includes(activity.metadata?.place?.id),
-  travellers: (values: string[]) => (activity: Activity) => (activity.travellers?.length === 0 || !!activity.travellers?.some(traveller => values.includes(traveller)))
+  travellers: (values: string[]) => (activity: Activity) => (activity.travellers?.length === 0 || !!activity.travellers?.some(traveller => values.includes(traveller))),
+  dates: (values: DatesFilter | null) => (activity: Activity) => true
 };
 
 export const NO_TRAVELER: TravellerProfile = {
