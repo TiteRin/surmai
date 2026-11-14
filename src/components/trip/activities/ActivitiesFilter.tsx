@@ -7,8 +7,10 @@ import type { ActivityFilterNames, ActivityFilters} from './filters.ts'
 import { getActiveFilters, defaultActivityFilters, NO_TRAVELER } from './filters.ts';
 import { StatusFilter } from './filters/StatusFilter.tsx';
 import { SearchableFilter } from './filters/SearchableFilter.tsx';
-import { Place, TravellerProfile } from '../../../types/trips.ts';
-import { DestinationChipFilter, StatusChipFilter, TravellerChipFilter } from './filters/ChipFilter.tsx';
+import { TravellerProfile, Trip } from '../../../types/trips.ts';
+import { DefaultChipFilter, DestinationChipFilter, StatusChipFilter, TravellerChipFilter } from './filters/ChipFilter.tsx';
+import { DatePickerInput } from '@mantine/dates';
+import dayjs from 'dayjs';
 
 const CountFiltersBadge = ({ count }: { count: number }) => {
   if (count === 0) {
@@ -19,13 +21,13 @@ const CountFiltersBadge = ({ count }: { count: number }) => {
 };
 
 type ActivitiesFilterProps = {
+  trip: Trip;
   onApplyFilters: (activityFilters: ActivityFilters) => void;
   onResetFilters: () => void;
-  destinations: Place[];
   travellers: TravellerProfile[]
 };
 
-export const ActivitiesFilter = ({ onApplyFilters, onResetFilters, destinations = [], travellers = [] }: ActivitiesFilterProps) => {
+export const ActivitiesFilter = ({ trip, onApplyFilters, onResetFilters, travellers = [] }: ActivitiesFilterProps) => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [currentFilters, setCurrentFilters] = useState<ActivityFilters>({
     ...defaultActivityFilters,
@@ -37,6 +39,7 @@ export const ActivitiesFilter = ({ onApplyFilters, onResetFilters, destinations 
 
   const activeFilters = getActiveFilters(currentFilters);
   const countFilters = Object.keys(activeFilters).length;
+  const destinations = trip.destinations || [];
 
   const filterTravellers = [
     ...travellers,
@@ -53,8 +56,13 @@ export const ActivitiesFilter = ({ onApplyFilters, onResetFilters, destinations 
   };
 
   const handleApplyFilters = () => {
-    setCurrentFilters(form.getValues());
-    onApplyFilters(form.getValues());
+
+    const formValues = form.getValues();
+
+    console.log("formValues: ", formValues)
+
+    setCurrentFilters(formValues);
+    onApplyFilters(formValues);
     setShowFilters(false);
   };
 
@@ -105,6 +113,19 @@ export const ActivitiesFilter = ({ onApplyFilters, onResetFilters, destinations 
                 <Grid>
                   <Grid.Col span={{ base: 12, md: 6 }}>
                     <StatusFilter key={form.key('status')} inputProps={form.getInputProps('status')} />
+                  </Grid.Col>
+                  <Grid.Col span={12}>
+                    <DatePickerInput
+                      key={form.key('dates')}
+                      label={t('activity_dates', 'Dates')}
+                      type={'range'}
+                      allowSingleDateInRange
+                      clearable
+                      minDate={trip.startDate}
+                      maxDate={trip.endDate}
+                      popoverProps={{withinPortal: false}}
+                      {...form.getInputProps('dates')}
+                    />
                   </Grid.Col>
                   <Grid.Col span={12}>
                     <SearchableFilter
@@ -175,6 +196,14 @@ export const ActivitiesFilter = ({ onApplyFilters, onResetFilters, destinations 
                   />
                 ))}
               </Group>
+            )}
+            {activeFilters.dates && (
+              <DefaultChipFilter
+                valueToDisplay={activeFilters.dates
+                  .map((date) => dayjs(date).format('LL'))
+                  .join(" - ")}
+                onClearFilter={() => handleClearFilter('dates')}
+              />
             )}
           </Group>
         )}

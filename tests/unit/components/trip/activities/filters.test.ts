@@ -77,15 +77,16 @@ describe('filters', () => {
       endDate: '2026-06-12T12:00:00',
     };
 
-    const dateFilter = { dates: ['2026-06-10', '2026-06-11']};
+    const dateFilter: { dates: [string, string]} = { dates: ['2026-06-10', '2026-06-11']};
 
     it('if the date range is not valid, throw an error', () => {
-      expect(() => filterActivities([], { dates: ['2026-06-10', '2026-06-09']})).toThrowError();
+      const activities = [inRangeActivity, outOfRangeActivity];
+      expect(() => filterActivities(activities, { dates: ['2026-06-10', '2026-06-09']})).toThrowError();
     });
 
     it('when no dates are defined, should return all activities', () => {
       const activities = [inRangeActivity, outOfRangeActivity];
-      expect(filterActivities(activities, { dates: null })).toEqual(activities);
+      expect(filterActivities(activities, { dates: [null, null] })).toEqual(activities);
     });
 
     it('when a date range is selected, should return only activities whose dates overlap', () => {
@@ -118,6 +119,14 @@ describe('countActiveFilters', () => {
     expect(countActiveFilters({ destinations: ['Paris, France'] })).toBe(1);
   });
 
+  it("when given default values for dates, should return 0", () => {
+    expect(countActiveFilters({ dates: [null, null] })).toBe(0);
+  });
+
+  it ("when given a range of dates, should return 1", () => {
+    expect(countActiveFilters({ dates: ['2026-06-10', '2026-06-09'] })).toBe(1);
+  });
+
   it('when given a status and a destination filter, should return 2', () => {
     expect(
       countActiveFilters({
@@ -140,4 +149,8 @@ describe("getActiveFilters", () => {
   it("when given a partial activeFilters, should return the partial object", () => {
     expect(getActiveFilters({status: "draft"})).toEqual({status: "draft"});
   });
+
+  it("when given a range of date, should return the range object", () => {
+    expect(getActiveFilters({ dates: ['2026-06-10', '2026-06-09'] })).toEqual({ dates: ['2026-06-10', '2026-06-09'] });
+  })
 });
